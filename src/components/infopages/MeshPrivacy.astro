@@ -1,0 +1,160 @@
+---
+import Title from "@components/global/Title.astro";
+---
+
+<section>
+	<div class="mx-auto max-w-7xl px-8 py-12 md:px-12 lg:px-32 lg:py-32">
+		<div>
+			<Title title="Privacy Policy" subtitle="Mesh — Last updated April 2026" class="pb-10 pt-20" subtitleClass="" />
+		</div>
+		<div class="prose-styles mt-12 lg:mt-24">
+
+			<h2>1. Overview</h2>
+			<p>Mesh is an open-source mobile forensics and secure networking tool developed by Barghest. It enables encrypted peer-to-peer communication between devices for purposes such as remote debugging, forensic data collection, and network analysis.</p>
+			<p>This privacy policy explains what data is processed, how it is handled, and the responsibilities of users deploying and operating Mesh.</p>
+
+			<h2 class="mt-12">2. Key principles</h2>
+			<ul>
+				<li>No central data collection by default</li>
+				<li>User-controlled infrastructure (self-hosted control plane)</li>
+				<li>End-to-end encrypted communications</li>
+				<li>Ephemeral, operator-controlled deployments</li>
+				<li>Open-source transparency</li>
+			</ul>
+			<p>Mesh is designed to minimize trust in central operators and does not function as a traditional cloud service.</p>
+
+			<h2 class="mt-12">3. Data we do not collect</h2>
+			<p>Barghest does <strong>not</strong> collect, store, or process:</p>
+			<ul>
+				<li>Personal data from end users</li>
+				<li>Device data transmitted through Mesh networks</li>
+				<li>Forensic artifacts collected via the tool</li>
+				<li>Network traffic routed through the Mesh</li>
+			</ul>
+			<p>There is <strong>no default telemetry, analytics, or tracking</strong> built into Mesh.</p>
+
+			<h2 class="mt-12">4. Data processed by the software</h2>
+			<p>While Barghest does not collect data, Mesh processes data locally or within user-controlled infrastructure.</p>
+
+			<h3 class="mt-8">4.1 Device &amp; network data</h3>
+			<ul>
+				<li>Device identifiers (e.g. node IDs, Mesh IP addresses)</li>
+				<li>Connection metadata required for peer-to-peer networking</li>
+				<li>NAT traversal and relay coordination data</li>
+			</ul>
+
+			<h3 class="mt-8">4.2 Forensic data (user-controlled)</h3>
+			<p>Depending on usage, Mesh may facilitate access to:</p>
+			<ul>
+				<li>Mobile device logs (e.g. Android bug reports, system logs)</li>
+				<li>File system data retrieved via ADB or similar tools</li>
+				<li>Network captures (PCAP)</li>
+				<li>Security telemetry (e.g. IDS outputs such as Suricata)</li>
+			</ul>
+			<p>This data is:</p>
+			<ul>
+				<li>Controlled by the operator deploying Mesh</li>
+				<li>Not transmitted to Barghest</li>
+				<li>Only accessible to authorized peers within the Mesh</li>
+			</ul>
+
+			<h2 class="mt-12">5. Encryption &amp; transport</h2>
+			<ul>
+				<li>Peer-to-peer connections are encrypted (e.g. WireGuard-based transport)</li>
+				<li>Relay fallback is used when direct connectivity is not possible</li>
+				<li>All traffic remains end-to-end encrypted</li>
+			</ul>
+			<p>Mesh is designed so that intermediaries cannot access plaintext content.</p>
+
+			<h2 class="mt-12">6. Relay infrastructure (DERP relays)</h2>
+			<p>When direct peer-to-peer connections cannot be established, Mesh uses relay servers ("DERP relays") to facilitate communication.</p>
+			<ul>
+				<li>By default, if a control plane operator has not configured their own relay infrastructure, Mesh may use relay servers provided by third parties</li>
+				<li>Relays forward encrypted traffic between peers and do <strong>not</strong> have access to plaintext content</li>
+				<li>Relay operators may process limited connection metadata (such as IP addresses, connection timing, and routing information) necessary to operate the service</li>
+				<li>Control plane operators may configure and operate their own relay infrastructure instead of using third-party relays</li>
+			</ul>
+			<p><strong>Important:</strong> Use of third-party relay infrastructure may expose connection metadata to the relay operator. Users operating in sensitive environments should consider deploying their own relay infrastructure.</p>
+
+			<h2 class="mt-12">7. Control plane &amp; self-hosting</h2>
+			<p>Mesh includes a control plane component which is typically self-hosted by the operator.</p>
+			<p>Control plane operators may process:</p>
+			<ul>
+				<li>Node metadata</li>
+				<li>Authentication data (e.g. device enrollment, API keys)</li>
+				<li>Network topology and policy information</li>
+			</ul>
+			<p><strong>Responsibility:</strong> The operator of a control plane deployment acts as the <strong>data controller</strong> (or processor, depending on context) for any personal data handled within that deployment.</p>
+			<p>Barghest does not operate a default hosted control plane.</p>
+
+			<h2 class="mt-12">8. User responsibilities</h2>
+			<p>Mesh is a tool, not a managed service.</p>
+			<p>Users are responsible for:</p>
+			<ul>
+				<li>Complying with applicable laws and regulations</li>
+				<li>Obtaining proper authorization before accessing or collecting device data</li>
+				<li>Ensuring lawful handling of personal and forensic data</li>
+				<li>Securing their infrastructure and deployments</li>
+			</ul>
+
+			<h2 class="mt-12">9. Security</h2>
+			<p>Mesh is designed with:</p>
+			<ul>
+				<li>End-to-end encryption</li>
+				<li>Minimal trust assumptions</li>
+				<li>Optional ephemeral deployment models</li>
+				<li>Reduced exposure of devices to the public internet</li>
+			</ul>
+			<p>However:</p>
+			<ul>
+				<li>The software may contain vulnerabilities</li>
+				<li>Users should perform independent security assessments before production use</li>
+			</ul>
+
+			<h2 class="mt-12">10. Data retention</h2>
+			<p>Barghest does not retain data.</p>
+			<p>Data retention is determined entirely by:</p>
+			<ul>
+				<li>The operator of the deployment</li>
+				<li>The infrastructure and storage systems in use</li>
+			</ul>
+
+			<h2 class="mt-12">11. Third-party components</h2>
+			<p>Mesh may incorporate or interoperate with third-party technologies, including:</p>
+			<ul>
+				<li>WireGuard-based networking components</li>
+				<li>Relay infrastructure (including DERP relays)</li>
+				<li>External forensic and debugging tools (e.g. ADB-based tooling)</li>
+			</ul>
+			<p>These components may have their own data handling characteristics and policies.</p>
+
+			<h2 class="mt-12">12. International use</h2>
+			<p>Mesh is designed for global use, including in high-risk or restricted environments.</p>
+			<p>Users are responsible for:</p>
+			<ul>
+				<li>Compliance with local data protection and surveillance laws</li>
+				<li>Export control regulations</li>
+				<li>Ethical handling of sensitive data</li>
+			</ul>
+
+			<h2 class="mt-12">13. Changes to this policy</h2>
+			<p>This privacy policy may be updated as the software evolves. Users should review it periodically.</p>
+
+			<h2 class="mt-12">14. Contact</h2>
+			<ul>
+				<li>GitHub: <a href="https://github.com/BARGHEST-ngo/MESH" target="_blank" class="text-black hover:underline font-semibold">github.com/BARGHEST-ngo/MESH</a></li>
+				<li>Website: <a href="https://barghest.asia" class="text-black hover:underline font-semibold">barghest.asia</a></li>
+			</ul>
+
+			<h2 class="mt-12">15. Summary</h2>
+			<ul>
+				<li>Barghest does not collect or process user data</li>
+				<li>All sensitive data remains under user control</li>
+				<li>Communications are end-to-end encrypted</li>
+				<li>Relay infrastructure may process limited metadata</li>
+				<li>Operators are responsible for lawful and secure use</li>
+			</ul>
+
+		</div>
+	</div>
+</section>

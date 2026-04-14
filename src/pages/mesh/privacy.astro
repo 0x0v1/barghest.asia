@@ -1,0 +1,18 @@
+---
+import MeshPrivacy from "@/components/infopages/MeshPrivacy.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import type { AstroSeoProps } from "@astrolib/seo";
+
+const seo: AstroSeoProps = {
+	title: "Privacy Policy - Mesh by Barghest",
+	description:
+		"Mesh privacy policy: open-source mobile forensics and secure networking tool. No central data collection, end-to-end encrypted, user-controlled infrastructure.",
+	canonical: "https://barghest.asia/mesh/privacy/",
+	noindex: true,
+	nofollow: true,
+};
+---
+
+<BaseLayout seo={seo}>
+	<MeshPrivacy />
+</BaseLayout>
