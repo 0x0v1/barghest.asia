@@ -40,6 +40,7 @@ const allProjects = (await getCollection("projects"))
 						image={project.data.image?.source}
 						displayText={project.data.displayText}
 							hideCardText={project.data.hideCardText}
+						transparentBg={project.data.transparentBg}
 						project={project.data.title}
 						link={`/work/${project.slug}`}
 						class={

@@ -25,6 +25,10 @@ let pages = [
 		url: "/blog/",
 	},
 	{
+		title: t("escalate"),
+		url: "/escalation/",
+	},
+	{
 		title: t("contacts"),
 		url: "/contact/",
 	},
@@ -42,11 +46,7 @@ const { pathname } = Astro.url;
 
 <header>
 	<a href={translatePath("/")} aria-label="Home" class="logo absolute z-50 flex h-[4.5rem] items-center md:h-[5.9rem]">
-		<Image
-				src={smallLogo}
-				alt="BARGHEST Logo"
-				class="logo-svg block h-auto w-56 md:w-72"
-		/>
+		<Image src={smallLogo} alt="BARGHEST Logo" class="logo-svg block h-auto w-56 md:w-72" />
 	</a>
 	<div data-xdata="{ open: false }" class="navigation fixed right-0 top-0 z-50" data-xbind.class="{'w-full navbar-open': open}">
 		<div class="ml-auto md:max-w-fit" data-xbind.class="{'max-w-3xl': open, 'max-w-[8rem]': !open }">

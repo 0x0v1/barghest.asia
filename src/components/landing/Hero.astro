@@ -25,17 +25,27 @@ const translatePath = useTranslatedPath(lang);
 					{t("hero.subtitle")}
 				</p>
 				<div class="flex flex-col items-center justify-center gap-4 lg:col-start-1">
-					<div class="squircle-bg rounded-lg bg-zinc-900" data-cursor-hover data-cursor-parallax>
-						<a
-							class="flex h-10 w-full max-w-56 flex-1 items-center justify-center px-5 py-2 text-xl text-slate-200 transition-all hover:text-white sm:w-auto md:font-bold lg:h-10"
-							aria-label="Contact Page"
-							href={translatePath("/contact/")}>
-							{t("contact")}
-						</a>
+					<div class="flex flex-col items-center justify-center gap-3 sm:flex-row">
+						<div class="squircle-bg rounded-lg bg-zinc-900" data-cursor-hover data-cursor-parallax>
+							<a
+								class="flex h-10 w-full max-w-56 flex-1 items-center justify-center px-5 py-2 text-xl text-slate-200 transition-all hover:text-white sm:w-auto md:font-bold lg:h-10"
+								aria-label="Escalation Page"
+								href={translatePath("/escalation/")}>
+								{t("escalate")}
+							</a>
+						</div>
+						<div class="squircle-bg rounded-lg bg-zinc-900" data-cursor-hover data-cursor-parallax>
+							<a
+								class="flex h-10 w-full max-w-56 flex-1 items-center justify-center px-5 py-2 text-xl text-slate-200 transition-all hover:text-white sm:w-auto md:font-bold lg:h-10"
+								aria-label="Contact Page"
+								href={translatePath("/contact/")}>
+								{t("contact")}
+							</a>
+						</div>
 					</div>
 
 					<small class="font-mono text-[11px] uppercase tracking-[0.3em] opacity-60">
-						{t("or")} 
+						{t("or")}
 						<LinkBlend id="go-projects-button" isButton={true}>{t("hero.scroll")}</LinkBlend>
 					</small>
 				</div>

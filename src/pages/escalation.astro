@@ -1,0 +1,15 @@
+---
+import Escalation from "@/components/infopages/Escalation.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import type { AstroSeoProps } from "@astrolib/seo";
+
+const seo: AstroSeoProps = {
+	title: "Mobile escalation and manual triage - BARGHEST",
+	description: "Guidance for collecting Android bug reports and iOS sysdiagnose bundles for manual mobile security triage by BARGHEST.",
+	canonical: "https://barghest.asia/escalation/",
+};
+---
+
+<BaseLayout seo={seo}>
+	<Escalation />
+</BaseLayout>

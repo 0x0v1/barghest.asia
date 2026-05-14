@@ -1,46 +1,39 @@
 ---
-import { Image } from "astro:assets";
-import advertisingSvg from "@assets/images/services/advertising.svg?raw";
-import designSvg from "@assets/images/services/creative-designer-doing-multitasking.svg?raw";
-import mobileSvg from "@assets/images/services/mobile-app-ui-ux-design.svg?raw";
-import seoSvg from "@assets/images/services/seo-link-building.svg?raw";
-import websiteSvg from "@assets/images/services/website-ui-ux-development.svg?raw";
-import { getLangFromUrl, useTranslations, useTranslatedPath } from "@i18n/utils";
+import { getLangFromUrl, useTranslations } from "@i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-const translatePath = useTranslatedPath(lang);
 
 const { class: className } = Astro.props;
 
 const points = [
 	{
-		title: t("websites.title"),
-		content: t("websites.content"),
+		title: t("principles.publicInterest.title"),
+		content: t("principles.publicInterest.content"),
 	},
 	{
-		title: t("apps.title"),
-		content: t("apps.content")
+		title: t("principles.researchLed.title"),
+		content: t("principles.researchLed.content"),
 	},
 	{
-		title: t("uiux.title"),
-		content: t("uiux.content")
+		title: t("principles.openMethods.title"),
+		content: t("principles.openMethods.content"),
 	},
 	{
-		title: t("seo.title"),
-		content: t("seo.content")
+		title: t("principles.localControl.title"),
+		content: t("principles.localControl.content"),
 	},
 	{
-		title: t("advertising.title"),
-		content: t("advertising.content")
+		title: t("principles.responsibleResearch.title"),
+		content: t("principles.responsibleResearch.content"),
 	},
 ];
 ---
 
-<section id="services" class:list={["section home-dark-section services-section relative", className]}>
+<section id="principles" class:list={["section home-dark-section principles-section relative", className]}>
 	<div class="wrapper relative col-span-12 h-screen w-full">
 		<div class="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center gap-4 pt-2 sm:pt-4">
-				<h2 class="font-mono text-xs uppercase tracking-[0.35em] opacity-50">////Principles</h2>
+			<h2 class="font-mono text-xs uppercase tracking-[0.35em] opacity-50">////principles</h2>
 			<div class="h-px flex-1 bg-current opacity-15"></div>
 		</div>
 		<div class="indicators absolute left-0 top-0 mt-[10vh] hidden h-[80vh] w-1 flex-col justify-between gap-2">
@@ -50,8 +43,13 @@ const points = [
 			points.map(({ title, content }) => (
 				<div class="point flex h-screen w-full items-center justify-center p-4 sm:p-8 md:p-16">
 					<article class="flex max-w-4xl flex-col items-center gap-6 text-center sm:gap-8 md:gap-10">
-						<h3 class="faq max-w-4xl font-display text-2xl uppercase leading-none text-center sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl">{title}</h3>
-						<p class="max-w-2xl font-mono text-sm leading-6 opacity-80 text-center sm:text-base md:text-lg md:leading-8 lg:text-xl xl:text-2xl" set:html={content} />
+						<h3 class="faq max-w-4xl text-center font-display text-2xl leading-none sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl">
+							{title}
+						</h3>
+						<p
+							class="max-w-2xl text-center font-mono text-sm leading-6 opacity-80 sm:text-base md:text-lg md:leading-8 lg:text-xl xl:text-2xl"
+							set:html={content}
+						/>
 					</article>
 				</div>
 			))
@@ -77,7 +75,7 @@ const points = [
 		var tl = gsap.timeline({
 			duration: points.length,
 			scrollTrigger: {
-				trigger: "#services",
+				trigger: "#principles",
 				start: "top center",
 				end: "+=" + height + "%",
 				scrub: 0.5,
@@ -87,23 +85,23 @@ const points = [
 			},
 		});
 
-		var pinner = gsap.timeline({
+		gsap.timeline({
 			scrollTrigger: {
-				trigger: ".services-section .wrapper",
+				trigger: ".principles-section .wrapper",
 				start: "top top",
 				end: "+=" + height + "%",
 				scrub: 0.5,
-				pin: ".services-section .wrapper",
+				pin: ".principles-section .wrapper",
 				pinSpacing: true,
 				id: "pinning",
 				markers: false,
 				snap: {
-					snapTo: [0, 0.25, 0.5, 0.7, 0.9], // snap to the closest label in the timeline
-					duration: { min: 0.1, max: 0.1 }, // the snap animation should be at least 0.2 seconds, but no more than 3 seconds (determined by velocity)
-					delay: 1, // wait 1 seconds from the last scroll event before doing the snapping
+					snapTo: [0, 0.25, 0.5, 0.7, 0.9],
+					duration: { min: 0.1, max: 0.1 },
+					delay: 1,
 					inertia: false,
 					directional: false,
-					ease: "power1.inOut", // the ease of the snap animation ("power3" by default)
+					ease: "power1.inOut",
 				},
 			},
 		});
@@ -111,19 +109,16 @@ const points = [
 		points.forEach(function (elem, i) {
 			gsap.set(elem, { position: "absolute", top: 0 });
 
-			// https://codepen.io/zank/pen/oNVjYMM?editors=0010
 			tl.to(indicators[i], { backgroundColor: "white", duration: 0.25 }, i);
-			tl.from((elem as HTMLElement).querySelector("svg"), { autoAlpha: 0 }, i);
 			tl.from((elem as HTMLElement).querySelector("article"), { autoAlpha: 0, translateY: 100 }, i);
 
 			if (i != points.length - 1) {
 				tl.to(indicators[i], { backgroundColor: "#333333", duration: 0.25 }, i + 0.75);
 				tl.to((elem as HTMLElement).querySelector("article"), { autoAlpha: 0, translateY: -100 }, i + 0.75);
-				tl.to((elem as HTMLElement).querySelector("svg"), { autoAlpha: 0 }, i + 0.75);
 			}
 		});
 	}
 
-	document.removeEventListener("DOMContentLoaded", init); // astro:page-load
-	document.addEventListener("DOMContentLoaded", init); // astro:page-load
+	document.removeEventListener("DOMContentLoaded", init);
+	document.addEventListener("DOMContentLoaded", init);
 </script>

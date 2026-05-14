@@ -1,0 +1,128 @@
+---
+import Title from "@components/global/Title.astro";
+---
+
+<section>
+	<div class="mx-auto max-w-7xl px-8 py-12 md:px-12 lg:px-32 lg:py-32">
+		<Title title="Research and DFIR privacy policy" subtitle="Effective date: 24/03/2026" class="pb-10 pt-20 uppercase" />
+
+		<div class="prose-styles mt-12 lg:mt-24">
+			<h2>Overview</h2>
+			<p>
+				BARGHEST conducts security research, reverse engineering, incident response, penetration testing, digital forensic investigations, and
+				open-source security tool development. Because this work may involve sensitive and high-risk data, we handle data lawfully, securely,
+				and transparently.
+			</p>
+			<p>
+				This policy covers research, DFIR, reverse engineering, and related security work. It is separate from the privacy policy that
+				explains how this website handles visitor analytics.
+			</p>
+
+			<h2 class="mt-12">Roles and responsibilities</h2>
+			<p>
+				BARGHEST acts as a data controller for forensic investigation data we receive, our internal operations, reverse engineering
+				operations, and open-source development or community interactions. We determine the purpose and means of processing within the scope
+				of each case.
+			</p>
+
+			<h2 class="mt-12">Data we process</h2>
+			<h3 class="mt-8">Forensic, incident response, penetration testing, and reverse engineering data</h3>
+			<p>We process data strictly for investigative and research purposes. This may include:</p>
+			<ul>
+				<li>Device extractions, mobile artefacts, disk images, or backups</li>
+				<li>System artefacts such as logs, application data, crash reports, and diagnostics</li>
+				<li>Communications data where relevant to an investigation</li>
+				<li>Files and documents relevant to an investigation</li>
+				<li>Malware samples, suspicious binaries, or other technical artefacts</li>
+			</ul>
+			<p>This data may contain personal data, sensitive personal data, confidential information, or other high-risk information.</p>
+
+			<h3 class="mt-8">Business operations data</h3>
+			<p>
+				We collect limited operational data such as names, email addresses, organization details, and communication records where needed to
+				operate and communicate.
+			</p>
+
+			<h3 class="mt-8">Open-source software and community contributions</h3>
+			<p>
+				When users interact with our public repositories, we may process usernames, public profile information, issue reports, comments,
+				discussions, commits, pull requests, and related contribution metadata. This information is publicly available and provided directly
+				by users.
+			</p>
+			<p>
+				Our open-source tools do not collect telemetry or usage data. If this changes, it will be clearly documented, opt-in only, and will
+				not include personally identifiable information.
+			</p>
+
+			<h2 class="mt-12">Purpose of processing</h2>
+			<p>We process data only to:</p>
+			<ul>
+				<li>Conduct digital forensic investigations or security research</li>
+				<li>Identify evidence of compromise, abuse, vulnerabilities, or incidents</li>
+				<li>Support security analysis and produce findings or reports</li>
+				<li>Improve the reliability and security of our open-source tools, without using investigation data for unrelated purposes</li>
+			</ul>
+			<p>We do not use investigation data for marketing, profiling, or unrelated secondary purposes.</p>
+
+			<h2 class="mt-12">Legal basis under GDPR</h2>
+			<p>
+				We process personal data under the General Data Protection Regulation where necessary for legitimate interests, including conducting
+				digital forensic investigations, identifying security threats, supporting security research and analysis, and protecting individuals
+				or organizations from harm.
+			</p>
+			<p>
+				Where investigations involve special category data, we may rely on Article 9 conditions including processing necessary for the
+				establishment, exercise, or defence of legal claims, reasons of substantial public interest where applicable, or scientific and
+				research purposes with appropriate safeguards.
+			</p>
+			<p>
+				Investigations are typically conducted on a consensual basis at the request of, and with authorization from, the device owner or
+				responsible party. However, investigation data may include information about individuals who have not directly provided consent, so
+				consent is not relied on as the primary GDPR legal basis.
+			</p>
+			<p>
+				In some cases, we process data not obtained directly from an individual, such as data contained within forensic artefacts. Where
+				applicable, we may rely on GDPR exemptions, including Article 14(5), where providing notice would be impossible, involve
+				disproportionate effort, or prejudice the objectives of the investigation.
+			</p>
+			<p>We may also process data where necessary to comply with applicable legal obligations.</p>
+
+			<h2 class="mt-12">Data retention</h2>
+			<p>
+				Investigation data is retained only as long as necessary for analysis, reporting, or legal purposes. Data is securely deleted when it
+				is no longer required.
+			</p>
+
+			<h2 class="mt-12">Data sharing</h2>
+			<p>
+				We do not sell or monetize data. We may share data only with authorized stakeholders involved in the investigation or where required
+				by law.
+			</p>
+
+			<h2 class="mt-12">Security measures</h2>
+			<p>
+				We implement appropriate technical and organizational safeguards, including encryption in transit and at rest, least-privilege access
+				controls, isolated analysis environments, and audit logging.
+			</p>
+
+			<h2 class="mt-12">Responsible disclosure</h2>
+			<p>
+				When we identify vulnerabilities, we follow responsible disclosure practices that balance public interest, user safety, vendor
+				remediation timelines, transparency, and accountability. We report vulnerabilities to affected vendors or maintainers where
+				appropriate, avoid exploit activity beyond what is necessary to validate impact, and take particular care in high-risk and civil
+				society contexts.
+			</p>
+			<p>
+				If you discover a vulnerability in our tools or infrastructure, report it to <a
+					href="mailto:info@barghest.asia"
+					class="font-semibold text-black hover:underline">
+					info@barghest.asia
+				</a>. Include a description of the issue, steps to reproduce, affected versions or components, and any proof-of-concept where
+				appropriate.
+			</p>
+
+			<h2 class="mt-12">Updates to this policy</h2>
+			<p>We may update this policy periodically. Updates will be published with a revised effective date.</p>
+		</div>
+	</div>
+</section>

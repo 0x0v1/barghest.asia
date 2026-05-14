@@ -39,6 +39,7 @@ const projectsCollection = defineCollection({
 			}).optional(),
 			displayText: z.string().optional(),
 				hideCardText: z.boolean().optional(),
+				transparentBg: z.boolean().optional(),
 		}),
 });
 

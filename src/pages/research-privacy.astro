@@ -1,0 +1,15 @@
+---
+import ResearchPrivacy from "@/components/infopages/ResearchPrivacy.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import type { AstroSeoProps } from "@astrolib/seo";
+
+const seo: AstroSeoProps = {
+	title: "Research and DFIR privacy policy - BARGHEST",
+	description: "Privacy policy for BARGHEST research, digital forensics, incident response, reverse engineering, and vulnerability research work.",
+	canonical: "https://barghest.asia/research-privacy/",
+};
+---
+
+<BaseLayout seo={seo}>
+	<ResearchPrivacy />
+</BaseLayout>

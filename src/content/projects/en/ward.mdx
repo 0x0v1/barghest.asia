@@ -3,23 +3,58 @@ pubDate: 2024-01-15
 author:
     name: Ovi
     link: /author/ovi
-title: WARD
+title: ward
 description: "Self-service forensics"
 link: https://github.com/BARGHEST-ngo/
-hideCardText: true
+image:
+    source: "@assets/images/projects/ward-logo-trimmed.png"
+    alt: "ward project logo"
+transparentBg: true
 ---
 
-WARD is a modular, open-source, decentralized tool for behavioral mobile forensics and artifact acquisition using Android ADB–accessible data. It’s developed by BARGHEST, a non-profit supporting the democratization of threat intelligence in the majority world. Heavily inspired by the legendary work that is AndroidQF we wanted to take this further by enhancing coverage to forensics logs and building a heuristics behavioral pattern engine on top for self-service forensics analysis providing a programmatic triaging mechanism. WARD collects and analyzes a wide range of live-state system artifacts — crash logs, process/thread listings, diagnostic outputs, Wi-Fi manager logs, installed apps — to preserve forensic evidence and surface patterns that might indicate spyware or other unwanted activity.
+ward is a modular, open-source tool for behavioural mobile forensics, Android artefact acquisition, and self-service device triage. It is developed by BARGHEST to make threat research and forensic capability more accessible to civil society, journalists, researchers, and public-interest defenders, particularly in majority world contexts where access to specialist forensic labs is limited.
 
-This enables civil society, journalists, and investigators to run self-service device triage, making spyware identification more accessible to many.
+ward is inspired by the practical utility of AndroidQF, but extends the workflow toward behavioural analysis. Rather than relying only on vendor telemetry, malware signatures, or preloaded indicators of compromise, ward collects live-state Android artefacts and applies heuristics that help surface patterns consistent with spyware, unwanted monitoring, exploitation attempts, or suspicious post-compromise activity.
 
-Rather than vendor telemetry, malware signatures, or preloaded IOCs, WARD uses behavioral based heuristics to spot patterns of malicious behavior. Our current heuristics cover:
+The goal is not to replace expert forensic review. The goal is to lower the first barrier: preserve useful evidence, give frontline teams a structured triage path, and help decide when a case should be escalated for deeper analysis.
 
-- Memory analysis: Signals against suspicious in-memory DEX loading, secondary DEX files from external storage, and shell-initiated code compilation that may indicate fileless malware or dynamic code injection.
-- System security: Signals against persistence mechanisms, suspicious app behaviors, unusual service patterns, and malware-like activity patterns across system logs
-- Permission analysis: Identifies dangerous permission abuse, privilege escalation attempts, and apps requesting excessive or suspicious permission combinations
-- Crash analysis: Detects crash patterns that may indicate exploitation attempts, buffer/heap overflows, or targeted attacks against system components
-- Memory exploitation: Attempts to identifies memory exploitation attempts synonymous with zero-click and one-click activity. It performs episode-based temporal analysis to identify memory corruption and exploitation attempts. Monitoring native crashes (SIGSEGV, SIGABRT, SIGBUS), heap exploitation (overflows, UAF, double-free), kernel driver abuse (Binder, GPU, futex, perf events), and high-value zero-click targets like media parsers, WebView, and system services. Related events are grouped within 15-second windows, applying scoring boosts for background zero-click exploits and dampening for user-triggered one-click crashes, while detecting repeated exploitation attempts and post-exploitation artifacts like HPROF dumps, OOM states, and log tampering.
-- User analysis: Detects anomalous user interaction patterns and suspicious user behavior that may indicate compromise
-- System anomalies (disabled by default): Catches general system irregularities and anomalous behaviors that don't fit other specific categories
-- Process anomalies (disabled by default): Monitors process creation patterns, suspicious process behaviors, and process-level indicators of compromise
+## What ward collects
+
+ward focuses on Android data that can be collected through consent-based, ADB-accessible workflows. Depending on the device state and collection mode, this may include:
+
+- Android bug reports and diagnostic output
+- Crash logs, tombstones, ANRs, and exploitation-adjacent crash patterns
+- Process and thread listings
+- Installed applications, package metadata, and permission state
+- System service state and configuration
+- Wi-Fi manager logs and selected network artefacts
+- Shell-accessible logs and live-state forensic artefacts
+
+## Behavioural analysis
+
+ward uses heuristic analysis to identify patterns that may deserve further review. Current and planned analysis areas include:
+
+- **Memory analysis:** suspicious in-memory DEX loading, secondary DEX files, shell-initiated code compilation, and other signs of dynamic code execution.
+- **System security:** persistence mechanisms, unusual services, suspicious app behaviour, and malware-like activity across system logs.
+- **Permission analysis:** dangerous permission combinations, privilege escalation attempts, and apps requesting access that appears excessive for their role.
+- **Crash analysis:** crash patterns that may indicate exploitation attempts, memory corruption, targeted parser attacks, or repeated failure around high-risk components.
+- **Memory exploitation analysis:** temporal clustering around native crashes, heap exploitation patterns, kernel-adjacent abuse, media parser crashes, WebView instability, and post-exploitation artefacts such as HPROF dumps or log tampering.
+- **User and interaction analysis:** anomalous device interaction patterns that may indicate abuse, remote control, or compromise.
+- **System and process anomalies:** optional checks for irregular process creation, unexpected runtime behaviour, and other suspicious system-level patterns.
+
+## Google Pixel Intrusion Logging
+
+ward is being extended to support analysis of Google Pixel Intrusion Logging data from Android Advanced Protection Mode. Intrusion Logging can provide a stronger source of consensual forensic evidence when it has been enabled before a suspicious event or high-risk period.
+
+This data can help investigators review security-relevant events such as:
+
+- Device unlocks and lock-state transitions
+- ADB shell usage and file transfer activity
+- Package installation and removal
+- Application process starts
+- DNS lookups and network connection events
+- Potential command-and-control or suspicious browsing activity
+
+Intrusion Logging is not retroactive, and it is currently most relevant to supported Pixel devices running Android 16 or later with Advanced Protection Mode and Intrusion Logging enabled. Because these logs may include sensitive network and browsing history, ward treats them as sensitive forensic artefacts and expects encrypted, consent-based handling.
+
+When combined with a bug report or other Android artefacts, Intrusion Logging can help build a more complete timeline of device activity and improve confidence during triage.

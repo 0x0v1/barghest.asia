@@ -1,0 +1,200 @@
+---
+import Title from "@components/global/Title.astro";
+---
+
+<section>
+	<div class="mx-auto max-w-7xl px-8 py-12 md:px-12 lg:px-32 lg:py-32">
+		<Title title="Escalation" subtitle="Mobile triage for Android and iOS" class="pb-10 pt-20 uppercase" />
+
+		<div class="prose-styles mt-12 lg:mt-24">
+			<h2>Trusted partners only</h2>
+			<p>
+				This service is offered to <strong>trusted partners only</strong>. Please reach out first so we can make an introduction before
+				using this workflow.
+			</p>
+			<p>
+				BARGHEST conducts DFIR for trusted partners who are concerned about spyware and need forensic support. We are not actively a threat
+				lab. This service exists for our partners: helplines, journalists, activists, and threat labs themselves. To escalate issues for
+				manual triage and, where needed, deeper forensic analysis.
+			</p>
+			<p>
+				If you are not already in contact with us, please email <a
+					href="mailto:info@barghest.asia"
+					class="font-semibold text-black hover:underline">
+					info@barghest.asia
+				</a> to introduce yourself and your case before sending any diagnostic data.
+			</p>
+
+			<h2 class="mt-12">Before you begin</h2>
+			<p>
+				This page explains how to collect diagnostic data for manual triage by BARGHEST. These artefacts can help us identify suspicious
+				behaviour, indicators of compromise, exploit-related crashes, unusual network activity, or other signs that a device may require
+				deeper forensic review.
+			</p>
+			<p>
+				Diagnostic bundles should be treated as sensitive forensic artefacts. They generally do not contain full message histories, photos, or
+				encrypted app data, but they may include device identifiers, app usage metadata, network endpoints, Wi-Fi names, email addresses,
+				contact references in logs, and other contextual information.
+			</p>
+			<p>
+				When possible, encrypt your submission using our PGP key before sending it to <a
+					href="mailto:info@barghest.asia"
+					class="font-semibold text-black hover:underline">
+					info@barghest.asia
+				</a>.
+			</p>
+			<p>
+				Before submitting diagnostic data, please read our <a href="/research-privacy/" class="font-semibold text-black hover:underline">
+					research and DFIR privacy policy
+				</a>, which explains how we handle forensic artefacts, investigation data, retention, sharing, and security safeguards.
+			</p>
+
+			<h2 class="mt-12">Choose your device</h2>
+
+			<div class="not-prose mt-8 grid gap-6 lg:grid-cols-2">
+				<article class="rounded-lg border border-slate-200 bg-white/70 p-6 shadow-sm">
+					<h3 class="font-display text-3xl">Android</h3>
+					<p class="mt-4 text-sm leading-6 text-slate-700">
+						Collect a full Android bug report. This creates a <code>.zip</code> file containing system logs, crash traces, process state, installed
+						app metadata, permissions, network summaries, and device configuration.
+					</p>
+					<ol class="mt-6 list-decimal space-y-3 pl-5 text-sm leading-6 text-slate-800">
+						<li>Open <strong>Settings</strong> → <strong>About phone</strong>.</li>
+						<li>Tap <strong>Build number</strong> 7 times to enable Developer Options.</li>
+						<li>Go to <strong>Settings</strong> → <strong>Developer Options</strong> → <strong>Take bug report</strong>.</li>
+						<li>Select <strong>Full report</strong>.</li>
+						<li>Wait for the report to complete. This may take several minutes.</li>
+						<li>Save the generated <code>bugreport.zip</code>.</li>
+						<li>Disable Developer Options after collection.</li>
+					</ol>
+					<p class="mt-6 text-sm leading-6 text-slate-700">
+						Advanced users may also collect the report with <code>adb bugreport</code> from a trusted computer.
+					</p>
+				</article>
+
+				<article class="rounded-lg border border-slate-200 bg-white/70 p-6 shadow-sm">
+					<h3 class="font-display text-3xl">iOS</h3>
+					<p class="mt-4 text-sm leading-6 text-slate-700">
+						Collect an iOS sysdiagnose. This creates a diagnostic bundle containing system and application logs, crash reports, analytics
+						logs, networking state, and process/service metadata.
+					</p>
+					<ol class="mt-6 list-decimal space-y-3 pl-5 text-sm leading-6 text-slate-800">
+						<li>
+							Press <strong>Volume Up</strong>, <strong>Volume Down</strong>, and the <strong>Side button</strong> at the same time.
+						</li>
+						<li>Hold briefly, around 1 second, then release when you feel a vibration.</li>
+						<li>Wait 5-10 minutes. There may be no visible progress indicator.</li>
+						<li>Open the <strong>Files</strong> app.</li>
+						<li>
+							Check <strong>On My iPhone</strong> → <strong>Logs</strong>, <strong>CrashReporter</strong>, <strong>
+								DiagnosticLogs
+							</strong>, or <strong>Analytics Data</strong>.
+						</li>
+						<li>Find the newest file named like <code>sysdiagnose_YYYY.MM.DD_HH-MM-SS.tar.gz</code>.</li>
+						<li>
+							Compress the sysdiagnose file into a <code>.zip</code> before sending if your mail client or encryption workflow requires a
+							ZIP container.
+						</li>
+					</ol>
+				</article>
+			</div>
+
+			<h2 class="mt-12">Android Pixel intrusion logging</h2>
+			<p>
+				If you use a supported Pixel device with Android Advanced Protection Mode and Intrusion Logging enabled, you may also be able to share
+				Android Intrusion Logging data. This can provide additional consensual forensic visibility into events such as device unlocks, ADB
+				interactions, package installation or removal, DNS lookups, and network connections.
+			</p>
+			<p>
+				Intrusion Logging is not a retroactive collection method. It only helps if it was enabled before the suspicious event or high-risk
+				period. It also requires Android 16 or later, a supported Pixel device, and a Google account. Because these logs may include sensitive
+				information such as browsing or network history, share them only with trusted forensic analysts and use encrypted transfer where
+				possible.
+			</p>
+			<ol>
+				<li>Open <strong>Settings</strong> → <strong>Security & privacy</strong> → <strong>Advanced Protection</strong>.</li>
+				<li>Confirm <strong>Device protection</strong> is enabled.</li>
+				<li>Open <strong>Intrusion Logging</strong> and confirm it is enabled.</li>
+				<li>If you need to export logs, open <strong>Intrusion Logging</strong> → <strong>Access logs</strong>.</li>
+				<li>Select <strong>Download and decrypt</strong>, then approve the request with your PIN or biometric authentication.</li>
+				<li>Open the Files app and go to <strong>Downloads</strong> → <strong>Intrusion Logging</strong>.</li>
+				<li>Compress the downloaded logs into a ZIP and send them with your Android bug report where possible.</li>
+			</ol>
+			<p>
+				Background: Amnesty International Security Lab has published a technical briefing on <a
+					href="https://securitylab.amnesty.org/latest/2026/05/android-intrusion-logging-as-a-new-source-of-data-for-consensual-forensic-analysis/"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="font-semibold text-black hover:underline">
+					Android Intrusion Logging as a source of consensual forensic data
+				</a>.
+			</p>
+
+			<h2 class="mt-12">Send the file</h2>
+			<p>
+				Send the collected ZIP to <a href="mailto:info@barghest.asia" class="font-semibold text-black hover:underline">info@barghest.asia</a>.
+				Include the device type, approximate time of suspected activity, your preferred contact method, and a short description of what
+				prompted the escalation. By sending diagnostic data, you acknowledge our <a
+					href="/research-privacy/"
+					class="font-semibold text-black hover:underline">
+					research and DFIR privacy policy
+				</a>.
+			</p>
+			<p>
+				If the ZIP is too large for email, contact us first and do not upload it to public file-sharing services. We will agree a safer
+				transfer method.
+			</p>
+
+			<h3 class="mt-8">PGP public key</h3>
+			<p>
+				Use this key for encrypted submissions to <a href="mailto:info@barghest.asia" class="font-semibold text-black hover:underline">
+					info@barghest.asia
+				</a>.
+			</p>
+			<pre
+				class="overflow-x-auto rounded-md border border-slate-300 bg-white p-4 text-xs">-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+xjMEaR7oFBYJKwYBBAHaRw8BAQdA7KWt5mzZqLpFODfrbW4d+GMJwlBZN4BC
+097N9IlGq87NJ2luZm9AYmFyZ2hlc3QuYXNpYSA8aW5mb0BiYXJnaGVzdC5h
+c2lhPsLAEQQTFgoAgwWCaR7oFAMLCQcJEA1gzgx7Bve7RRQAAAAAABwAIHNh
+bHRAbm90YXRpb25zLm9wZW5wZ3Bqcy5vcmcvKGeirZ1QKwoHg6wG185LNLSe
++Ohz9drZC+jWiN+xnAMVCggEFgACAQIZAQKbAwIeARYhBN0XNWvCJAOsb3aN
+vA1gzgx7Bve7AACYywEAqgjLNKSUEE515M5GE0uaXg7XiZLp8di40oQQpChK
+uagBALTOXNitqpwz4iBOYIXs/WIVEfHCqziBJd9F9Z/hQssLzjgEaR7oFBIK
+KwYBBAGXVQEFAQEHQKYph2j0QVbODVCvNPatOIXHZ5uaQLSP6QiAkpYk7S9j
+AwEIB8K+BBgWCgBwBYJpHugUCRANYM4Mewb3u0UUAAAAAAAcACBzYWx0QG5v
+dGF0aW9ucy5vcGVucGdwanMub3JniZW2j9f5o50NYAl8ZL2GauptmGsdkCt3
+f/2irrh8jSECmwwWIQTdFzVrwiQDrG92jbwNYM4Mewb3uwAAzisBAPoLuvwe
+RFTK7Gr/3R63mQPeOOiYic6DzCqPusEtfGBCAP9reiLCHERjBkgMtFgKbojm
+d7PjmQcXQJvPBxnUszDMDw==
+=SmiC
+-----END PGP PUBLIC KEY BLOCK-----</pre>
+
+			<h2 class="mt-12">What happens next</h2>
+			<p>
+				BARGHEST will parse logs and system artefacts, identify anomalies or potential indicators of compromise,
+				correlate events across system components, and provide an initial assessment where possible.
+			</p>
+			<p>Initial outcomes may include no findings, suspicious activity, or a recommendation for deeper review.</p>
+
+			<h2 class="mt-12">Escalation to deeper forensics</h2>
+			<p>
+				If a credible threat is identified, BARGHEST may ask to escalate to deeper forensic analysis using <a
+					href="https://github.com/BARGHEST-ngo/MESH"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="font-semibold text-black hover:underline">
+					MESH
+				</a>.
+			</p>
+			<p>
+				Deeper analysis may support secure remote ADB over an encrypted mesh network, live system interrogation, targeted artefact collection,
+				network traffic capture, and integration with tools such as MVT or AndroidQF.
+			</p>
+			<p>
+				This escalation is only requested when needed. Bug reports and sysdiagnose files are static snapshots; advanced threats may clean up
+				traces, operate intermittently, or avoid logging. Live analysis can provide higher-confidence findings when a snapshot is not enough.
+			</p>
+		</div>
+	</div>
+</section>
