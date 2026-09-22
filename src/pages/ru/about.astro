@@ -1,0 +1,14 @@
+---
+import AboutPage from "@/components/infopages/About.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import type { AstroSeoProps } from "@astrolib/seo";
+
+const seo: AstroSeoProps = {
+	title: "О BARGHEST — исследование безопасности с открытым кодом",
+	description: "BARGHEST исследует мобильную слежку и создаёт открытые криминалистические инструменты для гражданского общества в Восточной и Южной Азии.",
+};
+---
+
+<BaseLayout seo={seo}>
+	<AboutPage />
+</BaseLayout>

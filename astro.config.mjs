@@ -16,7 +16,7 @@ export default defineConfig({
 	site: "https://barghest.asia",
 	i18n: {
 		defaultLocale: "en",
-		locales: ["en", "cn"],
+		locales: ["en", "cn", "ru"],
 	},
 	markdown: {
 		drafts: true,
@@ -36,7 +36,7 @@ export default defineConfig({
 		sitemap({
 			filter: (page) => {
 				const pathname = new URL(page).pathname;
-				return !pathname.startsWith("/cn/") && !["/404/", "/thank-you/"].includes(pathname);
+				return !/\/(?:cn|ru)\//.test(pathname) && !["/404/", "/thank-you/"].includes(pathname);
 			},
 		}),
 		mdx(),

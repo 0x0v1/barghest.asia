@@ -8,7 +8,7 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
 const { pathname } = Astro.url;
-const isResearchPath = pathname.startsWith("/blog") || pathname.startsWith("/cn/blog");
+const isResearchPath = /^(?:\/(?:cn|ru))?\/blog(?:\/|$)/.test(pathname);
 ---
 
 <footer class="section gap-y-10 py-12 lg:gap-y-16 lg:py-24">
@@ -37,7 +37,7 @@ const isResearchPath = pathname.startsWith("/blog") || pathname.startsWith("/cn/
 					<a href={translatePath("/tags/")} data-footer-logo-target="visible">Tags</a>
 					<a href={translatePath("/contact/")} data-footer-logo-target="visible">{t("contacts")}</a>
 					<a href={translatePath("/privacy/")} data-footer-logo-target="visible">Privacy Policy</a>
-					<a href={translatePath("/rss.xml")} data-footer-logo-target="visible">RSS</a>
+					<a href="/rss.xml" data-footer-logo-target="visible">RSS</a>
 				</div>
 			</div>
 			<div class="col-span-3 mt-10 lg:col-start-4">
@@ -112,7 +112,7 @@ const isResearchPath = pathname.startsWith("/blog") || pathname.startsWith("/cn/
 	function init() {
 		var goTopButton = document.getElementById("go-top-button");
 		const footerLogo = document.querySelector<HTMLElement>(".footer-logo-link");
-		const isResearchPage = window.location.pathname.startsWith("/blog") || window.location.pathname.startsWith("/cn/blog");
+		const isResearchPage = /^(?:\/(?:cn|ru))?\/blog(?:\/|$)/.test(window.location.pathname);
 
 		if (footerLogo && isResearchPage) {
 			footerLogo.classList.add("footer-logo-hidden");

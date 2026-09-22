@@ -10,18 +10,23 @@ const lang = getLangFromUrl(Astro.url);
 const path = getUrlWithoutLang(Astro.url);
 const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
+const localeOptions = [
+	{ code: "en", label: "EN" },
+	{ code: "cn", label: "CN" },
+	{ code: "ru", label: "RU" },
+] as const;
 
 let pages = [
 	{
-		title: "Home",
+		title: t("homepage"),
 		url: "/",
 	},
 	{
-		title: "About",
+		title: t("about"),
 		url: "/about/",
 	},
 	{
-		title: "Research",
+		title: t("blog.title"),
 		url: "/blog/",
 	},
 	{
@@ -42,7 +47,8 @@ let pages = [
 // }
 
 const { pathname } = Astro.url;
-const isResearchPath = pathname.startsWith("/blog") || pathname.startsWith("/cn/blog");
+const isResearchPath = /^(?:\/(?:cn|ru))?\/blog(?:\/|$)/.test(pathname);
+const localePrefix = /^\/(?:cn|ru)(?=\/|$)/;
 ---
 
 <header>
@@ -102,8 +108,8 @@ const isResearchPath = pathname.startsWith("/blog") || pathname.startsWith("/cn/
 											data-logo-target={page.url === "/blog/" ? "hidden" : "visible"}
 											class={`inline-block cursor-pointer px-1 py-[0.33rem] ${
 												page.url === pathname ||
-												page.url === pathname.replace(/^\/cn|\/$/, "") ||
-												(page.url === "/blog" && (pathname.startsWith("/blog") || pathname.startsWith("/cn/blog")))
+												page.url === pathname.replace(localePrefix, "") ||
+												(page.url === "/blog/" && isResearchPath)
 													? "active"
 													: ""
 											}`}>
@@ -116,19 +122,21 @@ const isResearchPath = pathname.startsWith("/blog") || pathname.startsWith("/cn/
 									</li>
 								))
 							}
-							<!-- CN button hidden for now -->
-							<!--
-							<li>
-								<a href={translatePath(path, lang === "cn" ? "en" : "cn")} class="inline-block cursor-pointer px-1 py-[0.33rem]">
-									<span class="menu-item-container inline-block">
-										<span
-											class="menu-item px-4 py-1 text-base font-semibold uppercase leading-8 text-zinc-400 hover:text-white focus:text-white focus:shadow-none focus:outline-none">
-											{lang === "it" ? "en" : "cn"}
-										</span>
-									</span>
-								</a>
+							<li class="flex items-center px-3 py-[0.33rem]" aria-label="Language selector">
+								{
+									localeOptions.map((locale) => (
+										<a
+											href={translatePath(path, locale.code)}
+											aria-current={lang === locale.code ? "page" : undefined}
+											class:list={[
+												"px-1 text-sm font-semibold leading-8 transition-colors hover:text-white focus:text-white focus:outline-none",
+												lang === locale.code ? "text-white" : "text-zinc-400",
+											]}>
+											{locale.label}
+										</a>
+									))
+								}
 							</li>
-							-->
 						</ul>
 					</nav>
 				</div>
@@ -225,7 +233,7 @@ const isResearchPath = pathname.startsWith("/blog") || pathname.startsWith("/cn/
 
 	function init() {
 		const logo = document.querySelector<HTMLElement>("header .logo");
-		const isResearchPage = window.location.pathname.startsWith("/blog") || window.location.pathname.startsWith("/cn/blog");
+		const isResearchPage = /^(?:\/(?:cn|ru))?\/blog(?:\/|$)/.test(window.location.pathname);
 
 		if (logo && isResearchPage) {
 			logo.classList.add("logo-hidden");
@@ -305,9 +313,9 @@ const isResearchPath = pathname.startsWith("/blog") || pathname.startsWith("/cn/
 					x: () => {
 						const pathName = window.location.pathname;
 
-						if (pathName === "/" || pathName === "/cn/") {
+						if (pathName === "/" || pathName === "/cn/" || pathName === "/ru/") {
 							return "9.5rem";
-						} else if (pathName.startsWith("/blog") || pathName.startsWith("/cn/blog")) {
+						} else if (/^(?:\/(?:cn|ru))?\/blog(?:\/|$)/.test(pathName)) {
 							return "3.5rem";
 						}
 

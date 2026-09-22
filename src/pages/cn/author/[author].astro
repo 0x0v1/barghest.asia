@@ -12,7 +12,7 @@ export async function getStaticPaths() {
 			const [lang, ...slug] = entry.slug.split("/");
 			return { params: { lang, author: slug.join("/") || undefined }, props: entry };
 		})
-		.filter((entry) => entry.params.lang === "it");
+		.filter((entry) => entry.params.lang === "cn");
 }
 
 const author = Astro.props;
@@ -20,7 +20,7 @@ const author = Astro.props;
 const seo: AstroSeoProps = {
 	title: author.data.name,
 	description: author.data.description,
-	canonical: `https://barghest.asia/it/author/${author.slug}/`,
+	canonical: `https://barghest.asia/cn/author/${author.slug}/`,
 };
 ---
 

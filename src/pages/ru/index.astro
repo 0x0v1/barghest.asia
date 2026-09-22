@@ -1,0 +1,12 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Hero from "@components/landing/Hero.astro";
+import OperatingStandards from "@components/landing/OperatingStandards.astro";
+import WorkPreview from "@components/landing/WorkPreview.astro";
+---
+
+<BaseLayout>
+	<Hero />
+	<WorkPreview class="!pt-20 pb-20 lg:!pt-36 lg:pb-40" />
+	<OperatingStandards />
+</BaseLayout>

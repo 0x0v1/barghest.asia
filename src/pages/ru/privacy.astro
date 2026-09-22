@@ -1,0 +1,14 @@
+---
+import PrivacyPage from "@/components/infopages/Privacy.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import type { AstroSeoProps } from "@astrolib/seo";
+
+const seo: AstroSeoProps = {
+	title: "Политика конфиденциальности | BARGHEST",
+	description: "Как BARGHEST обрабатывает информацию при посещении barghest.asia.",
+};
+---
+
+<BaseLayout seo={seo}>
+	<PrivacyPage />
+</BaseLayout>

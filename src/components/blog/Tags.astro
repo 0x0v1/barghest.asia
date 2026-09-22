@@ -7,11 +7,12 @@ import { getLangFromUrl, useTranslations, useTranslatedPath } from "@i18n/utils"
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
+const contentLang = "en";
 
 const allPosts = (await getCollection("posts"))
 	.filter((post) => {
 		const [postLang, ...slug] = post.slug.split("/");
-		return postLang === lang;
+		return postLang === contentLang;
 	})
 	.map((post) => {
 		const [postLang, slug] = post.slug.split("/");

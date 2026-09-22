@@ -1,5 +1,6 @@
 ---
 import BlobCursorFollower from "@/components/global/BlobCursorFollower.astro";
+import AutoTranslate from "@/components/global/AutoTranslate.astro";
 import { AstroSeo, type AstroSeoProps } from "@astrolib/seo";
 import BaseHead from "@components/BaseHead.astro";
 import BackgroundTexture from "@components/global/BackgroundTexture.astro";
@@ -83,7 +84,7 @@ const seo: AstroSeoProps = {
 	title,
 	description,
 	canonical,
-	noindex: lang === "cn" || seoProp?.noindex,
+	noindex: lang !== "en" || seoProp?.noindex,
 	openGraph: {
 		...defaultSeo.openGraph,
 		...seoProp?.openGraph,
@@ -141,6 +142,7 @@ Onward.
 		{pageStructuredData && <script type="application/ld+json" set:html={JSON.stringify(pageStructuredData)}></script>}
 	</head>
 	<body class:list={["bg-slate-50", bodyClass]}>
+		<AutoTranslate />
 		<BackgroundTexture />
 		<Navigation />
 		{cursorFollowerActive() && <BlobCursorFollower />}

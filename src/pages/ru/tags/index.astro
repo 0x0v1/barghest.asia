@@ -1,0 +1,14 @@
+---
+import type { AstroSeoProps } from "@astrolib/seo";
+import Tags from "@components/blog/Tags.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+const seo: AstroSeoProps = {
+	title: "Темы исследований | BARGHEST",
+	description: "Просматривайте исследования BARGHEST о мобильной безопасности, шпионском ПО, Android, уязвимостях, Bluetooth и цифровой криминалистике.",
+};
+---
+
+<BaseLayout seo={seo}>
+	<Tags />
+</BaseLayout>

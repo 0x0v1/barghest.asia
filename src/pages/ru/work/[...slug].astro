@@ -4,9 +4,9 @@ import type { AstroSeoProps } from "@astrolib/seo";
 import MarkdownPostLayout from "@layouts/MarkdownPostLayout.astro";
 
 export async function getStaticPaths() {
-	const blogEntries = await getCollection("posts");
+	const projectEntries = await getCollection("projects");
 
-	return blogEntries
+	return projectEntries
 		.map((entry) => {
 			const [lang, ...slug] = entry.slug.split("/");
 			return { params: { lang, slug: slug.join("/") || undefined }, props: entry };
@@ -18,7 +18,7 @@ const entry = Astro.props;
 const { Content } = await entry.render();
 
 const seo: AstroSeoProps = {
-	title: entry.data.title,
+	title: `${entry.data.title} | BARGHEST`,
 	description: entry.data.description,
 };
 ---

@@ -1,9 +1,10 @@
 ---
 import { getCollection } from "astro:content";
 import WokCard from "@components/work/WokCard.astro";
-import { getLangFromUrl } from "@i18n/utils";
 
-const lang = getLangFromUrl(Astro.url);
+// Localized project write-ups are not maintained separately; use the current
+// English WARD/MESH collection while the surrounding interface is localized.
+const contentLang = "en";
 
 const { class: className } = Astro.props;
 
@@ -23,7 +24,7 @@ const projectOrder = ["ward", "mesh"];
 const allProjects = (await getCollection("projects"))
 	.filter((prj) => {
 		const [postLang, ...slug] = prj.slug.split("/");
-		return postLang === lang;
+		return postLang === contentLang;
 	})
 	.map((prj) => {
 		const [postLang, slug] = prj.slug.split("/");

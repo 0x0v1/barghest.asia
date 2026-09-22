@@ -1,0 +1,56 @@
+---
+import { getLangFromUrl } from "@i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const targetLanguage = lang === "cn" ? "zh-CN" : lang === "ru" ? "ru" : undefined;
+---
+
+{
+	targetLanguage && (
+		<>
+			<div id="google-translate-element" aria-hidden="true"></div>
+			<script is:inline define:vars={{ targetLanguage }}>
+				const translationCookie = `/en/${targetLanguage}`;
+				document.cookie = `googtrans=${translationCookie}; path=/; SameSite=Lax`;
+
+				window.googleTranslateElementInit = () => {
+					new window.google.translate.TranslateElement(
+						{
+							pageLanguage: "en",
+							includedLanguages: "zh-CN,ru",
+							autoDisplay: false,
+						},
+						"google-translate-element",
+					);
+
+					const selectLanguage = () => {
+						const selector = document.querySelector(".goog-te-combo");
+						if (!(selector instanceof HTMLSelectElement)) return false;
+
+						selector.value = targetLanguage;
+						selector.dispatchEvent(new Event("change"));
+						return true;
+					};
+
+					let attempts = 0;
+					const languageTimer = window.setInterval(() => {
+						if (selectLanguage() || ++attempts === 20) window.clearInterval(languageTimer);
+					}, 100);
+				};
+			</script>
+			<script is:inline src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+		</>
+	)
+}
+
+<style is:global>
+	#google-translate-element,
+	.goog-te-banner-frame,
+	.skiptranslate > iframe {
+		display: none !important;
+	}
+
+	body {
+		top: 0 !important;
+	}
+</style>

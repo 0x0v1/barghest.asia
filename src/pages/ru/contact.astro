@@ -1,0 +1,14 @@
+---
+import Contact from "@/components/forms/Contact.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import type { AstroSeoProps } from "@astrolib/seo";
+
+const seo: AstroSeoProps = {
+	title: "Контакты BARGHEST",
+	description: "Свяжитесь с BARGHEST по вопросам открытых криминалистических инструментов, исследований безопасности и сотрудничества.",
+};
+---
+
+<BaseLayout seo={seo}>
+	<Contact />
+</BaseLayout>

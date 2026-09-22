@@ -6,33 +6,27 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 
 export async function getStaticPaths() {
 	const allPosts = (await getCollection("posts")).filter((post) => {
-		const [postLang, ...slug] = post.slug.split("/");
+		const [postLang] = post.slug.split("/");
 		return postLang === "en";
 	});
 
 	const uniqueTags = [...new Set(allPosts.flatMap((post) => post.data.tags))];
-	return uniqueTags.map((tag) => {
-		const filteredPosts = allPosts.filter((post) => post.data.tags.includes(tag))
-			.map(post => {
-				// Remove language prefix from slug
-				const [postLang, ...slugParts] = post.slug.split("/");
-				return {
-					...post,
-					slug: slugParts.join("/")
-				};
-			});
-		return {
-			params: { tag },
-			props: { posts: filteredPosts },
-		};
-	});
+	return uniqueTags.map((tag) => ({
+		params: { tag },
+		props: {
+			posts: allPosts
+				.filter((post) => post.data.tags.includes(tag))
+				.map((post) => ({ ...post, slug: post.slug.split("/").slice(1).join("/") })),
+		},
+	}));
 }
+
 const { tag } = Astro.params;
 const { posts } = Astro.props;
 
 const seo: AstroSeoProps = {
-	title: `${tag} research | BARGHEST`,
-	description: `BARGHEST research and technical analysis tagged ${tag}.`,
+	title: `${tag} — исследования | BARGHEST`,
+	description: `Исследования и технический анализ BARGHEST по теме ${tag}.`,
 };
 ---
 
