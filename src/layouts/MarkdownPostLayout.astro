@@ -23,7 +23,14 @@ const { frontmatter, body, seo, structuredData } = Astro.props;
 function getArticleReadingTime(body: string): number {
 	if (!body) return 0;
 	const wordsPerMinute = 183;
-	const numberOfWords = body.split(/\s/g).length;
+	const prose = body
+		.replace(/```[\s\S]*?```/g, " ") // fenced code blocks
+		.replace(/`[^`]*`/g, " ") // inline code
+		.replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1") // links/images -> visible text
+		.replace(/<[^>]+>/g, " ") // html tags
+		.replace(/^\s*\|.*$/gm, " ") // table rows
+		.replace(/[#>*_~`|-]/g, " "); // leftover markdown punctuation
+	const numberOfWords = prose.split(/\s+/).filter(Boolean).length;
 	const minutes = numberOfWords / wordsPerMinute;
 	const readTime = Math.ceil(minutes);
 	return readTime;
