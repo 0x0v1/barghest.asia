@@ -5,22 +5,25 @@ import { getLangFromUrl, useTranslations } from "@i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-// Research is maintained in English; localized routes translate this current
-// collection rather than rendering the obsolete demo-language content.
-const contentLang = "en";
 
-const allPosts = (await getCollection("posts"))
-	.filter((post) => {
-		const [postLang, ...slug] = post.slug.split("/");
-		return postLang === contentLang;
-	})
+// Research is maintained in English and enumerated from that canonical
+// collection; the obsolete demo-language content is never surfaced. A
+// localized route (e.g. /ru/blog) renders a post's translation when one
+// exists at posts/<lang>/<slug>, and falls back to English otherwise.
+const collection = await getCollection("posts");
+const translations = new Map<string, (typeof collection)[number]>();
+for (const post of collection) {
+	const [postLang, ...rest] = post.slug.split("/");
+	if (postLang === "en") continue;
+	translations.set(`${postLang}/${rest.join("/")}`, post);
+}
+
+const allPosts = collection
+	.filter((post) => post.slug.split("/")[0] === "en")
 	.map((post) => {
-		const [postLang, slug] = post.slug.split("/");
-
-		return {
-			...post,
-			slug: slug,
-		};
+		const slug = post.slug.split("/").slice(1).join("/");
+		const localized = lang === "en" ? post : translations.get(`${lang}/${slug}`) ?? post;
+		return { ...localized, slug };
 	})
 	.sort((a, b) => Number(b.data.pubDate) - Number(a.data.pubDate));
 ---

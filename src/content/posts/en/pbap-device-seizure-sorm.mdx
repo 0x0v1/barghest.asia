@@ -1,0 +1,393 @@
+---
+pubDate: 2026-09-23
+author:
+    name: BARGHEST
+    link: /author/barghest
+title: "Data collection on Russian borders in device seizures aligned with SORM"
+description: "How contacts and call history leave a seized phone over Bluetooth PBAP: a Russian border seizure forensicated using MESH correlates to the identifier collection that feeds SORM."
+seoTitle: "PBAP call-log extraction in device seizures aligned with SORM"
+seoDescription: "BARGHEST reconstructs a Russian border device seizure where contacts and call history were pulled over Bluetooth PBAP, reproduces it on a stock Pixel 8, and maps the identifier collection to SORM selectors."
+image:
+    source: "@assets/images/blog/pbap-device-seizure-sorm.png"
+    alt: "Security research - Bluetooth PBAP call-log extraction during a device seizure"
+tags: ["security", "forensics", "bluetooth", "android", "surveillance"]
+---
+
+Image attribution: telephone lines from [Pix_telephone-lines-886146](https://www.flickr.com/photos/zhrefch/25581750195) by [zhrefch](https://www.flickr.com/photos/zhrefch/), released under [Public Domain Dedication (CC0)](https://creativecommons.org/publicdomain/zero/1.0/deed.en). Digital art by [SHOCKHAM](https://shockham.com/).
+
+____
+
+## Introduction
+
+Device seizure is an increasingly relevant part of mobile surveillance and forensic investigation. In jurisdictions where law enforcement can force, pressure or otherwise coerce access to a device, or where the procedural safeguards around seizure are weak, an unlocked handset can be inspected without meaningful consent. We see this happening increasingly in the authoritarian contexts we serve, where the people whose phones are taken are journalists, human rights defenders, researchers and others of interest, and where the act of taking the phone is itself the abuse of power.
+
+In a recent case, a forensic analyst using [MESH](https://github.com/BARGHEST-ngo/MESH) to conduct remote forensics examined a phone immediately after a human rights defender crossed a Russian border and had their phone seized and returned by border-control and law-enforcement officers. The phone was in the officers' control for a few minutes. MESH supports remote forensic acquisition, traffic analysis and manual investigation together, and the investigation in this case surfaced two distinct behaviour patterns in that window, mapping onto two different intelligence goals:
+
+1. **Identifier collection.** Activity consistent with reading the IMEI (`*#06#`) and then the SIM and mobile-network settings. This gathers the device identifier (IMEI) and SIM/network details.
+2. **Contact and call-history extraction via PBAP abuse.** Bluetooth enabled, a device paired, and the Bluetooth process reading the call log over PBAP.
+
+The second pattern is the subject of most of this post, because PBAP as a covert extraction channel is rarely looked for when investigating non-consensual forensics activity, even though the underlying capability exists in commercial tooling (Part 6). The method is not new. PBAP has pulled phonebooks over Bluetooth for roughly two decades, and its abuse has been discussed in the abstract for years, but we have found no documented case of it being used as a covert extraction channel in an actual device seizure, nor a forensic account of the traces it leaves behind. That gap, not the mechanism, is what this post addresses. But the two are best read together: in a Russian border-control context, extracting a target's contacts and call history is, in all likelihood, a screen for contacts with Ukrainian numbers (`+380`) and known persons of interest, a map of who the HRD talks to, while the identifier collection produces selectors usable against network-side interception (SORM).
+
+This post is about one specific way that call history and contacts leave a phone in that situation: the Phone Book Access Profile (PBAP), a standard Bluetooth profile. PBAP was designed so a car could show your contacts. The same design makes it an almost ideal logical-extraction channel, without the use of a dedicated forensic platform like MKO: it needs no app on the phone, no ADB, no root, no filesystem access and no persistent USB relationship. The privileged read of the call log happens inside the phone, performed by the Android Bluetooth service on behalf of a remote device. Android's Bluetooth trust model is coarse-grained and device-level: a paired peripheral is trusted across sensitive profiles, often without notifying the user. This has been criticised for years, by security researchers (Naveed et al. on external-device mis-bonding [\[2\]](#ref-2), and Xu et al. in BadBluetooth [\[1\]](#ref-1), who showed a paired peer is trusted per device rather than per profile and can reach sensitive profiles with no fresh prompt) and in wider reporting on Bluetooth's attack surface (for example the BlueBorne disclosures [\[3\]](#ref-3)). What this post adds is the forensic side: the specific, correlatable traces a PBAP pull leaves on a seized device, and a live reproduction on the current Android mainline stack.
+
+The seized device was a vendor-customised Android handset; its exact model and build are withheld to protect the owner. The reproduction device is a stock Pixel 8 (Android 17). We keep these separate and label every vendor-specific claim, because some of the important behaviour in the case lives in the seized device's own vendor code. The core PBAP path, however, now ships as a Google mainline module, so the same code runs across recent devices regardless of vendor.
+
+## Acknowledgements
+
+We thank the forensic analysts working on these cases, and the human rights defenders whose consent made publishing this work possible. We also thank the [MVT](https://github.com/mvt-project/mvt) team for the use of MVT for ADB collection, via [MESH](https://github.com/BARGHEST-ngo/MESH/), in the forensic investigation.
+
+This research was conducted by our forensics partners and BARGHEST.
+
+## Part 1: What PBAP is, and the code path that reads your call log
+
+Our team is often critical of Bluetooth. While we try to stay conscious of that bias, since we are frequently finding vulnerabilities in Bluetooth implementations, to see why PBAP is dangerous we have to first see its legitimate use case.
+
+A car head unit wants to show you your contacts and recent calls on its own screen. It cannot mount your phone's filesystem. It cannot run Android, it has no idea how any particular phone stores its call log, and it must work with every phone ever made. What it needs is a vendor-neutral, read-only contract for a small, well-defined set of data: give me the phonebook, give me the last calls, in a format it already understands (vCard).
+
+PBAP is exactly that contract. And every property that makes it a good car-integration profile is also what makes it a good extraction channel:
+
+- **No application on the phone.** The capability is built into the Bluetooth stack. An operator installs nothing on the target.
+- **No root, no filesystem access.** The remote side never touches Android storage. It sends an abstract request ("give me the incoming-call history"), and the phone's own privileged Bluetooth process does the reading.
+- **A narrow, standardised data set.** Phonebook and call history, as portable vCards. No exploit, no parsing of a proprietary database, just data served in a documented format.
+- **It is always on offer.** A stock phone advertises the PBAP server over SDP as a standing service.
+
+PBAP was designed to be a no-app, no-root, no-filesystem read path for your contacts and calls. That sentence is the whole thesis of this post. It was meant for your car. Nothing in the design says the thing on the other end has to be a car.
+
+How it works: PBAP is an application profile built on OBEX, the object-exchange protocol behind Bluetooth file transfer, which runs over RFCOMM and L2CAP:
+
+```
+HCI  >  ACL  >  L2CAP  >  RFCOMM  >  OBEX  >  PBAP
+```
+
+It is client/server. The phone is the server (Phone Book Access Server, PSE). The remote device, whether a car or an extraction tool, is the client (PCE). The client opens an OBEX session and issues `GET` requests for named objects, and the phone answers with vCards. The data model is broader than a contact list. The server exposes separate objects under a `telecom` repository:
+
+| Object | Path | Content |
+|--------|------|---------|
+| `pb`  | `/telecom/pb`  | phonebook (contacts) |
+| `fav` | `/telecom/fav` | favourites |
+| `ich` | `/telecom/ich` | incoming call history |
+| `och` | `/telecom/och` | outgoing call history |
+| `mch` | `/telecom/mch` | missed call history |
+| `cch` | `/telecom/cch` | combined call history |
+
+(There are `/SIM1/telecom/...` equivalents for SIM-stored data.)
+
+The client never sees the Android call-log database. It asks for `/telecom/cch`, and the Android Bluetooth service queries the local `CallLog` provider itself, composes vCards, and streams them back. The privileged read is done by the phone, to itself, on the remote party's behalf. That is why the trace it leaves is attributed to `com.android.bluetooth` and not to any app the operator brought with them.
+
+We pulled the Bluetooth module off a current device and decompiled it for review. While we pulled it from a Pixel device, we use it here in reference to implementations similar to other OEMs. On the Pixel 8 (Android 17) the stack is not a vendor APK. It is the Google mainline module:
+
+```
+/apex/com.android.bt/app/BluetoothGoogle@370549400/BluetoothGoogle.apk
+package: com.google.android.bluetooth
+```
+
+Because the PBAP server now ships in a mainline APEX, it is increasingly the same code across recent devices rather than a per-vendor fork. A remote `GET` lands in `BluetoothPbapObexServer.onGet()`, which dispatches by object type:
+
+```
+BluetoothPbapObexServer.onGet()                 // [L236]
+   ├── pullVcardListing()                       // [L343]
+   ├── pullVcardEntry()                         // [L346]
+   └── pullPhonebook()                          // [L349]
+```
+
+The legal object paths are hard-coded, and they are the `telecom` set above:
+
+```java
+// BluetoothPbapObexServer, L66
+public static final String[] LEGAL_PATH = {
+    TELECOM_PATH, PB_PATH, FAV_PATH, ICH_PATH, OCH_PATH, MCH_PATH, CCH_PATH };
+```
+
+For call history the path leads into `BluetoothPbapVcardManager`, where the Bluetooth process queries the call-log content provider directly:
+
+```java
+// BluetoothPbapVcardManager (Android 17 mainline), getCallHistorySize()  [L132]
+cursor = BluetoothMethodProxy.getInstance().contentResolverQuery(
+    this.mResolver,
+    CallLog.Calls.CONTENT_URI,          // the privileged read
+    null,
+    BluetoothPbapObexServer.createSelectionPara(i),
+    null,
+    "date DESC");
+```
+
+`loadCallHistoryList()` issues the same `CallLog.Calls.CONTENT_URI` query to build the returned vCards. This line is the origin of the `READ_CALL_LOG` AppOp that a forensic examiner later finds attributed to the Bluetooth process. Contacts go through the same manager against `ContactsContract`, producing `READ_CONTACTS`. Neither path runs because Bluetooth is merely on. Both require a profile-level operation, a remote client actually requesting an object, which is what lets the AppOp be tied to a specific session rather than to background noise.
+
+There is a second way the Bluetooth process can read the call log: the Hands-Free phonebook code (`hfp.AtPhonebook`, using `AT+CPBS` and `AT+CPBR`), used by headsets and car kits over the headset profile. The detection methodology below separates the two.
+
+## Part 2: The consent model is the vulnerability
+
+Whether a PBAP session is allowed comes down to a single stored value per remote device, the phonebook access permission. When a session starts, the server checks it:
+
+```java
+// BluetoothPbapService.checkOrGetPhonebookPermission()  [L592]
+int perm = getAdapterService().getPhonebookAccessPermission(remoteDevice);
+if (perm == 1) {                       // ACCESS_ALLOWED
+    setConnectionPolicy(remoteDevice, 100);
+    pbapStateMachine.sendMessage(1);   // PBAP proceeds, no prompt
+    return;
+}
+if (perm == 2) {                       // ACCESS_REJECTED
+    pbapStateMachine.sendMessage(2);   // denied
+    return;
+}
+// otherwise UNKNOWN: broadcast CONNECTION_ACCESS_REQUEST, wait 30s for the user
+```
+
+If the permission is already `ALLOWED`, the bulk read of your phonebook and call history proceeds silently. There is no prompt at the moment the data is taken. A prompt happens only in the `UNKNOWN` case. The permission is set at pairing, where the flow calls `setPhonebookAccessPermission(device, ACCESS_ALLOWED)` (value `1`) when contact sharing is enabled, or `ACCESS_REJECTED` (value `2`) when it is not:
+
+```java
+// BluetoothPbapService, L224 / L230
+getAdapterService().setPhonebookAccessPermission(bluetoothDevice, 1); // ACCESS_ALLOWED
+...
+getAdapterService().setPhonebookAccessPermission(bluetoothDevice, 2); // ACCESS_REJECTED
+```
+
+For a person whose phone is being handled by someone else, the four seconds of a pairing dialog are the entire consent gate. Accept the pairing with contact sharing enabled, and every later phonebook and call-history read runs with no further UI.
+
+This is the weakness Xu et al. documented in BadBluetooth [\[1\]](#ref-1). Android authenticates the device at pairing, not each profile at use, so a bonded peer is trusted for sensitive profiles without a fresh prompt, and a device paired under a benign profile can switch to another profile afterwards to reach data it never openly requested. They showed this on Android 5.1 through 8.1 on a Pixel 2. The code above is the same design, still shipping seven years later in the Android 17 mainline module.
+
+On the seized device's vendor build the pairing dialog itself sets the permission, and its contact-sharing box is pre-ticked when the peer announces itself as a hands-free car kit (Bluetooth device class `0x0408`). That pre-tick lives in the vendor's `BluetoothPairingController` customisation. We did not verify it on the Pixel and do not claim it as generic Android. What is generic, because it is in the mainline module above, is the underlying rule: `ALLOWED` means silent, and pairing is what sets `ALLOWED`.
+
+## Part 3: What the mechanism predicts
+
+Before any evidence, the code tells us what a PBAP extraction should look like afterwards, and what it should not:
+
+1. A `READ_CALL_LOG` AppOp (and usually `READ_CONTACTS`) attributed to the Bluetooth process, timed inside a Bluetooth connection, and not refreshed when the Bluetooth stack next restarts, because it was driven by a remote request rather than by stack startup.
+2. No such AppOp from mere connection. Enabling Bluetooth, an ACL link coming up, or a bond forming should not by itself read the call log.
+3. No audio profile for the peer, since PBAP is not HFP or A2DP, and no app installed by the operator.
+4. A pairing event immediately before, possibly with no separate permission prompt at all.
+
+Part 4 tests these predictions against a real seizure, then confirms them on a device we control.
+
+## Part 4: The findings, a seizure and reproduction
+
+### The seizure
+
+The seized handset, a vendor-customised Android build, was in officers' hands for a few minutes during a Russian border-control seizure. A forensics investigation including an [MVT](https://github.com/mvt-project/mvt) acquisition was conducted remotely and non-root by a forensic analyst shortly afterwards using MESH, so the short-lived system state and logs survived. There was no usable HCI capture: persistent Bluetooth snooping was off, and the surviving `btsnooz_hci.log` held only a header. The raw PBAP packets were gone. What follows is the correlation that identified both behaviour patterns anyway.
+
+**Pattern 1: identifier collection.** Before the Bluetooth activity, during the time of seizure the handset showed a short identifier sequence. In the Dialer there were five keypad tones and no call placed, with the Dialer left open for about 44 seconds afterwards. This pattern is consistent with `*#06#`, the IMEI display code (interpretation, medium-high confidence; the digits themselves are not recorded). The UI then entered the mobile-network settings for about 11.6 seconds; here UsageStats does identify the page, as `com.android.phone`'s `MobileNetworkSettings`, which shows the carrier and, where the operator provisions it, the SIM's phone number, but not the IMSI. Together these describe collection of the device identifier (IMEI, inferred) and a look at the SIM and network configuration.
+
+These read directly from the bug report; each is a `dumpsys` service section within it (absolute times withheld):
+
+- **`media.metrics`**: the Dialer's DTMF tone generator started five times in quick succession, and a vendor power-management service log independently recorded five activations of the Dialer's UID at the same moments.
+- **`telecom`** (call analytics): no call was placed in the window; the first call is hours later.
+- **`usagestats`**: the Dialer in the foreground, then `com.android.phone`'s `MobileNetworkSettings` (`ACTIVITY_RESUMED` to `ACTIVITY_PAUSED`, about 11.6 s).
+
+Why that matters is in Part 5.
+
+**Pattern 2: the Bluetooth and PBAP extraction.** From the acquisition, in one short window (offsets shown relative to the moment Bluetooth was enabled during device seizure window; absolute dates and times are withheld):
+
+```
+T+00.0 s  Bluetooth enabled  "by com.android.settings"  (off for hours prior)
+T+08.0 s  ACL_CONNECTED      external device, session 1
+T+08.5 s  BluetoothPairingDialog shown, accepted within ~4 s
+T+22.5 s  com.android.bluetooth -> READ_CALL_LOG        (inside the session)
+T+26.9 s  ACL_DISCONNECTED   session 1
+T+27.1 s  last write ever to the Bluetooth bond database
+T+27.3 s  ACL_CONNECTED again (session 2), 1 service UUID
+T+35.1 s  ACL_DISCONNECTED   session 2
+```
+
+Each line above is a distinct artefact in the bug report (offsets are relative; absolute times withheld):
+
+| Observation | Source in the acquisition |
+|---|---|
+| Bluetooth enabled by `com.android.settings` | `dumpsys bluetooth_manager`, the Enable log |
+| ACL connect/disconnect, one service UUID | the Android Auto receiver log (`GearheadCarStartupService`) |
+| Pairing dialog shown and accepted | `dumpsys usagestats` (`BluetoothPairingDialog`) |
+| `READ_CALL_LOG` by the Bluetooth process | `dumpsys appops` (also the MVT `timeline.csv`) |
+| Last bond-database write | `dumpsys dbinfo` (`bluetooth_db-wal` mtime) |
+| No audio peer | `dumpsys audio` (AudioService) and the Bluetooth profile-service log |
+| PBAP-vs-HFP profile state | `dumpsys wifi` (`ClientModeImpl`) |
+
+Every prediction from Part 3 is present. The `READ_CALL_LOG` is attributed to the Bluetooth process, sits inside the ACL session, and was not refreshed at the next Bluetooth stack restart hours later, so it was driven by a remote request. There was no audio device for the peer (AudioService shows none), no app installed, no foreign ADB key, no OPP file transfer, no MAP or SMS read, no Wi-Fi Direct. The pairing dialog was accepted in four seconds, the consent gate of Part 2.
+
+The case cannot confirm contacts were taken due to data overwrite, but we assume with high confidence they were, and it is worth being clear about why. A PBAP client normally pulls the phonebook first, and on this build a PBAP session reads the contacts database on connect regardless of what the client goes on to request: `BluetoothPbapService.onConnect()` fires `LOAD_CONTACTS`, which calls `BluetoothPbapUtils.loadAllContacts()` and queries `ContactsContract`. In the seizure, Bluetooth had been off for hours and was switched on seconds before the connection, so contacts were not yet loaded, and the session would itself have made `com.android.bluetooth` read the contacts database. That is why we are confident contacts were read. The reason we cannot point to the mark directly is that the Bluetooth process's `READ_CONTACTS` AppOp had been overwritten an hour later by the service's routine reaction to a later contacts change, so the slot says nothing either way. This is notable for forensic integrity: if you believe PBAP has been used to acquire your contacts, do not modify or touch them before a forensic acquisition, because ordinary use overwrites the very record that would show the access. Absence of a mark is not evidence of absence, it is an overwritten record.
+
+**What the seizure establishes.** Without HCI packets the exact OBEX request cannot be shown directly. What the evidence supports, at stated confidence: call-history access happened (AppOps, direct); it was Bluetooth-mediated (temporal correlation, strong); PBAP was the mechanism (code path present plus no audio profile, strong); the exact objects are unrecoverable (no HCI). The remote device, its vendor and the operator's tooling cannot be identified from what survived.
+
+### Reproducing it on a device we control
+
+The seizure gives a positive trace, a `READ_CALL_LOG` inside a Bluetooth session during the device seizure, but has to infer PBAP as the cause. To close that gap we reproduced the extraction end to end using PBAP and watched the same traces appear. The target was a stock Pixel 8 on Android 17 (build `CP2A.260805.005`), call log and contacts populated, not rooted. The client was an ordinary Linux laptop running BlueZ, driving a PBAP pull through the standard `obexd` PhonebookAccess API, in the role a forensic tool or a car would play. All Bluetooth addresses are redacted.
+
+**The server is a standing service:** The stock Pixel's SDP record advertises the phonebook server alongside the SIM-access and message-access servers, with no app installed and nothing enabled by us:
+
+```
+UUID: Phonebook Access Server   (0000112f-...)
+UUID: SIM Access                (0000112d-...)
+UUID: Message Access Server     (00001132-...)
+```
+
+(We read this from the device's resolved SDP record. Establishing that it is advertised before any pairing would need a dedicated SDP browse, which the current BlueZ userland no longer ships, so we did not measure that.)
+
+**Connection alone does not read the call log on Pixel:** This is the negative control for the seizure's prediction 2. We bonded and connected, then read the Bluetooth process's AppOps before any PBAP request:
+
+```
+com.google.android.bluetooth
+  FINE_LOCATION   Access: T-2h30m   (the connection)
+  WAKE_LOCK       Access: T-2h30m   (the connection)
+  READ_CALL_LOG   Access: T-2h30m   (unchanged, stale from an earlier session)
+  READ_CONTACTS   Access: T-2h30m   (unchanged)
+```
+
+Bonding and connecting fired location and wake-lock operations but left `READ_CALL_LOG` and `READ_CONTACTS` untouched. Connectivity is not access. We note that this may be different on different OEMs.
+
+The first PBAP session, with phonebook permission not granted, failed almost instantly:
+
+```
+CreateSession(pbap) -> org.bluez.obex.Error.Failed: Transport got disconnected   (~430 ms)
+```
+
+The PBAP server accepted the RFCOMM socket and closed it at once. A refused session looks like an instant transport drop, not an on-screen denial, so there is nothing for an examiner to find that says "access denied". We then enabled one toggle on the Pixel, "Contacts and call history sharing" for the paired host, which is `setPhonebookAccessPermission(ACCESS_ALLOWED)` from Part 2, and repeated the identical pull. It succeeded, with no prompt at data-access time.
+
+With permission `ALLOWED` we pulled `pb`, `ich`, `och`, `mch`, `cch`. The Bluetooth process's AppOps moved to the moment of the pull:
+
+| AppOp | Before | After (at the pull) |
+|-------|--------|---------------------|
+| `READ_CONTACTS` | stale (earlier session) | pull time |
+| `READ_CALL_LOG` | stale (earlier session) | pull time + 1 s |
+
+Contacts were read one second before the call log. The phonebook is pulled first, which is exactly why the seizure's overwritten `READ_CONTACTS` slot is consistent with contacts having been read there too. The objects that came back were real:
+
+```
+pb.vcf   184 vCards   (contacts)
+ich.vcf   50 vCards   (incoming calls)
+och.vcf   50 vCards   (outgoing calls)
+mch.vcf   50 vCards   (missed calls)
+cch.vcf   50 vCards   (combined)
+```
+
+Each call record carried its metadata, for example `X-IRMC-CALL-DATETIME;RECEIVED:20xxxxxxTxxxxxx`. PBAP provides 184 contacts and 200 call records off a stock, patched Pixel with no root, no app on the phone and no filesystem access. The reproduction holds both ends the seizure could only hold one of: we caused a PBAP pull and saw the `READ_CALL_LOG` and `READ_CONTACTS` traces the case relied on, next to a negative control showing connection alone produces neither.
+
+**How this maps to the seizure.** The value of the reproduction is not the Pixel, it is the match. Each result on the bench lines up with something the acquisition did or did not preserve, and it is worth being precise about which are direct matches and which are only consistency:
+
+| Seizure, what survived | Reproduction, what we caused | What the match establishes |
+|---|---|---|
+| `READ_CALL_LOG` on the Bluetooth process, inside the session, not refreshed at the next stack restart | The pull fires `READ_CALL_LOG` on the Bluetooth process at pull time | The seizure's central trace is exactly what a PBAP pull produces. Direct match. |
+| `READ_CONTACTS` slot overwritten hours later, says nothing either way | The pull fires `READ_CONTACTS` one second before the call log | The mark the seizure lost is one the same pull would have written. Consistency, not proof. |
+| No audio peer, no app, no OPP or MAP transfer | The same negative picture around a pure phonebook pull | Separates a PBAP extraction from a car kit or headset doing its job. |
+| Connection window present, the cause of the read not isolable from it alone | Negative control: connect only, both AppOps stay stale | Rules out mere connection as the source of the read. |
+
+So the reproduction does not prove what happened to this specific handset; the overwrite and the missing packets put that beyond reach. What it proves is the cause and effect the case had to infer: a PBAP pull, and only a PBAP pull, leaves the pattern the seizure showed, while connection alone leaves nothing. The seizure supplies the effect on a real target, the reproduction supplies the cause on identical software, and the two only fit one story.
+
+### What the extraction was for
+
+The handset evidence is neutral about why the data was taken. The context for us is not. In a Russian border-control seizure, pulling a target's contacts and call history is most plausibly a screen of the target's social graph, in particular for contacts with Ukrainian numbers (`+380`) and known persons of interest. This is interpretation from the context and our partners, not from the bytes on the phone. PBAP returns the whole phonebook and call history as vCards, as the reproduction showed, and nothing in the surviving trace says which entries mattered to the operator.
+
+What did not happen in the same window is as telling as what did. Beyond reading identifiers and pulling the call history, we found no other data acquisition: no SMS or MAP extraction, no Bluetooth file transfer, no Wi-Fi Direct, no installed app or agent, and no screenshot, screen recording, camera or microphone use. The operator did navigate the phone by hand, but nothing else was read off it. That narrowness matters: the collection was scoped to device and subscriber identifiers plus the phonebook and call history, which is a targeted screen rather than a full forensic image, and it is exactly the shape of collection that feeds network-side correlation. The identifiers are the selectors SORM works from, and the call graph is the set of relationships those selectors sit within, which is the subject of Part 5.
+
+## Part 5: SORM: why identifier collection matters at the border
+
+Pattern 1 looks minor next to a bulk contact pull. In a Russian context it is not, and the reason is SORM.
+
+SORM is Russia's network-side lawful interception system, infrastructure attached to telecommunications operators that provides interception to authorised agencies. SORM-3 adds bulk collection and deep-packet-inspection capability, and it supports targeting by selector, including telephone number, IMSI, IMEI and MAC address, alongside network traffic. Recorded Future's Insikt Group has documented SORM's architecture and its export to states in Central Asia and Latin America, including the likelihood that Moscow retains access to SORM-based systems deployed abroad [\[7\]](#ref-7). That makes the identifier-collection pattern coherent:
+
+```
+                 TELECOM / NETWORK SIDE
+              +---------------------------+
+              |           SORM-3          |
+              |   selectors:              |
+              |     - phone number        |
+              |     - IMSI                |
+              |     - IMEI                |
+              |     - MAC address         |
+              |   + network traffic / DPI |
+              +-------------+-------------+
+                            |  correlation
+                            v
+              +---------------------------+
+              |        SEIZED DEVICE      |
+              |   - IMEI inspection (*#06#)|  < identifier
+              |   - SIM / network settings |  < identifier
+              |   - Bluetooth pairing      |
+              |   - PBAP call-log/contacts |  
+              +---------------------------+
+
+  proven on handset ===   context / network-side ...
+```
+
+This says something bounded. The handset evidence does not prove SORM and does not need to. SORM is a network-side capability. If it were involved it would be evidenced at the operator, not as anything installed on the phone. What the handset shows is narrower but still meaningful: the IMEI (inferred from the `*#06#` sequence) and the phone's Bluetooth MAC (necessarily disclosed to the peer by the pairing), both of which are SORM-3 selectors, plus a visit to the mobile-network settings. We did not find evidence that the IMSI or the phone number were read; those are identifiers SORM correlates, not ones the handset proves were taken here. Even so, an IMEI and a MAC address, read during a seizure, are values that let network-side records for this device be pulled and correlated later.
+
+## Part 6: The forensic tooling, PBAP, Oxygen and MKO Systems
+
+PBAP phonebook acquisition is not unknown to commercial forensics. Oxygen Forensic Detective documents acquisition over Bluetooth, including phonebook and contacts, alongside USB and agent-based methods, and pulling a phonebook and call history over Bluetooth is, in practice, PBAP (with OBEX and AT/HFP as the sibling paths for older phones).
+
+That capability can be made concrete rather than inferred. We [reverse-engineered the Bluetooth engine (`drvman.dll`) of MOBILedit](https://x.com/BARGHESTasia/status/2102766593386098847?s=20), another mainstream commercial forensic product (COMPELSON Laboratories), from a clean official build. It is a textbook PBAP client: it resolves the phone's RFCOMM channel over SDP, opens an `AF_BTH` socket, sends the PBAP OBEX target UUID (`796135f0-f0c5-11d8-0966-0800200c9a66`) on connect, and issues `GET telecom/{pb,ich,och,mch}.vcf` with the `x-bt/phonebook` MIME, parsing the returned vCards locally. Notably, the call-history objects (`ich`/`och`/`mch`) were added between the 2015 build and the 2024 one and still ship in the current 64-bit build (10.10.0.35095, August 2026), so pulling call history over PBAP is a current commercial capability, not a legacy leftover. MOBILedit is a different product from Oxygen or MKO and we cite it only as an independently checkable example that the client capability is real and shipping; details are in the companion teardown.
+
+Oxygen Forensics began as Oxygen Software in Moscow in the early 2000s before registering as Oxygen Forensics Inc. in the United States. According to reporting by Olga Lautman and Andrii Luchkov, and earlier reporting in Forbes, its founders Oleg Fedorov and Oleg Davydov also helped establish MKO Systems, the Russian company behind "Мобильный Криминалист" (Mobile Criminalist) [\[4\]](#ref-4)[\[5\]](#ref-5). Mobile Criminalist has become Russia's leading phone-extraction platform and, per Russian procurement and court records cited in that reporting, has been supplied to state agencies including the FSB and the Ministry of Internal Affairs and used in politically sensitive prosecutions. The same reporting links a sanctioned, former-FSB investor, Eduard Bendersky, to the Oxygen holding company, and notes Oxygen obtained an FSB cryptographic licence in 2021.
+
+Independent confirmation that these tools are actually fielded, rather than merely sold, comes from Russian professional literature. A 2024 article in the Bulletin of the East Siberian Institute of the Ministry of Internal Affairs of Russia reports that, in a study of internal-affairs practice, the most popular software tools among the operational units of the Ministry's territorial bodies are MOBILedit and Mobile Criminalist, with Cellebrite's UFED and MSAB's XRY regarded as more capable but less widely used [\[8\]](#ref-8). That is a Ministry-of-Internal-Affairs source placing the two products at the centre of this section directly in the hands of Russian operational units, in the covert investigative context a border seizure belongs to.
+
+We do not claim that a specific Oxygen, MKO or MOBILedit product performed this extraction; the acquisition cannot name the tool. The narrower, better-supported point is this: a mature Russian mobile-forensic ecosystem exists, is used by Russian law enforcement and security services, and shares its origins with a mainstream Western product. PBAP phonebook and call-history extraction sits squarely within the documented capabilities of that ecosystem. A border seizure that quietly pulls contacts and call history over PBAP is consistent with tooling from precisely this milieu, whether a bespoke build or a feature of an existing platform.
+
+## Part 7: Detection methodology
+
+The useful signal is not a single IOC. It is the convergence of several ordinary Android artefacts. A practical workflow:
+
+1. Acquire as soon as possible after a seizure. Volatile state decays fast.
+2. Preserve Bluetooth state. Do not reboot, toggle Bluetooth, or cycle airplane mode if you can avoid it. An airplane-mode cycle resets the stack's in-memory bond and connection records, which hold the peer's address, and a reboot loses more.
+3. Normalise clocks before correlating. A single bug report can print several clock zones or formats (in the case: the device's home zone, a second zone after travel, UTC, and epoch-milliseconds).
+4. Build the event window from epoch-millisecond UsageStats, not whole-second listings. Sub-second order is what ties a pairing dialog to a link event.
+5. Identify Bluetooth enable, ACL and pairing events.
+6. Examine AppOps for `READ_CALL_LOG`, `READ_CONTACTS` and `READ_SMS` on the Bluetooth process, and compare against the last stack start.
+7. Determine which profiles were actually active (AudioService, adapter state) to separate PBAP from HFP.
+8. For advanced users: inspect the Bluetooth module on the relevant firmware. Decompile it; the PBAP and HFP code paths and the permission logic settle questions that would otherwise be opinion. On recent Android this is the mainline APEX, so the code is portable.
+9. Correlate the bond database mtime and bond state.
+10. Rule out ADB, USB, package installs and other persistence separately.
+11. Recover HCI snoop data where it exists.
+12. Distinguish observed facts from code-verified behaviour from inference, and write negatives with their coverage.
+
+> **Decision rule.** A `READ_CALL_LOG` by the Bluetooth process that is not refreshed at the next stack start was driven by a remote device. With an audio device present, that is a car kit or headset doing its job. With no audio device and no bond left behind, it is an extraction.
+
+## Part 8: Mitigations
+
+None of these defeats compelled unlocking, but each raises the cost.
+
+- Remove call history and contacts before an expected search and restore them afterwards. PBAP can only serve what is on the phone.
+- Keep Bluetooth off at all times possible. On current firmware the pairing dialog is the only consent step for phonebook access; there is no prompt when the data is read.
+- Empty the Gallery trash deliberately rather than relying on the 30-day auto-purge. (A side finding from the case: opening the Gallery triggered an automatic expired-trash cleanup of 661 files. Not every bulk change during a seizure is an operator action.)
+- A powered-off phone is harder to extract than a locked, running one, though this does not help once the owner is made to unlock it.
+- If later proof matters more than the privacy of the log, enable Bluetooth HCI snoop logging before travel. With it, the case's bug report would have held the peer's address, class and the full PBAP exchange. It also records all of the owner's own Bluetooth traffic.
+
+## Limitations
+
+- The remote device in the case cannot be identified. No address, name, class or vendor prefix survived.
+- The exact PBAP objects requested in the case are not recoverable, because there was no HCI capture. The Pixel reproduction shows what those objects and their traces look like, but it is a separate device and cannot fill the case's gap.
+- Contacts: a contacts read by the Bluetooth process during the session is code-verified, since a PBAP session loads contacts on connect, but the surviving `READ_CONTACTS` AppOps slot was overwritten hours later. Whether the phonebook was transmitted to the remote is not provable without an HCI capture.
+- The PBAP-versus-HFP `ClientModeImpl` discriminator is code-verified on the seized device's vendor build only. No live HFP negative control was run.
+- The seized device's vendor pairing behaviour, the dialog setting the permission itself and the `0x0408` car-kit pre-tick (Part 2), is vendor code and is not claimed as generic Android.
+- The operator's tooling cannot be attributed to any product. Our view that it sits within the Russian forensic ecosystem described in Part 6 is an assessment, not a device finding; the acquisition cannot name the tool.
+- Pattern 1 is partly interpretation. The `*#06#`/IMEI reading rests on five Dialer tones and no call. The mobile-network page is identified from UsageStats (`MobileNetworkSettings`), but what was actually read from it, the carrier and any provisioned phone number, is not recoverable, and it does not display the IMSI. IMSI and phone-number recovery are not evidenced; the phone's Bluetooth MAC was disclosed to the peer by the pairing.
+- The Ukrainian-number purpose and the SORM discussion are context, not device findings. The handset cannot show why the data was taken, and cannot show any interaction with a network-side interception system.
+
+These limitations are part of the result, not gaps to be filled by inference.
+
+## Conclusion
+
+PBAP is a legitimate Android Bluetooth interface for exposing phonebook and call-history data to devices like cars. Its design, no app, no root, no filesystem access, a narrow standardised data set, always advertised, is what makes it a logical-extraction channel during a seizure. Consent is a single value set at pairing, and once it is `ALLOWED` the bulk read is silent.
+
+We showed the code path in the shipping mainline Bluetooth module, reconstructed a real Russian border-control seizure where the packets were long gone, and reproduced the full extraction on a stock, patched Pixel 8: 184 contacts and 200 call records pulled with no root and no app on the phone, leaving exactly the `READ_CALL_LOG` and `READ_CONTACTS` traces the case relied on, next to a negative control proving connection alone leaves none.
+
+In that seizure the pull did not stand alone. It sat beside identifier collection, IMEI and SIM, and the two fit together: the contacts and call history map the target's social graph, most plausibly a screen for Ukrainian contacts and known actors, while the identifiers are the selectors a system like SORM targets. PBAP phonebook acquisition is a documented commercial capability, and it sits within a Russian forensic ecosystem, MKO Systems' Mobile Criminalist, which shares its origins with Oxygen Forensics and is used by Russian law enforcement, that this seizure fits. We prove the handset side and are explicit that the rest is context.
+
+Bluetooth is not only a connectivity artefact. PBAP is a data-access path, the Android services implementing it leave evidence across the system, and that evidence can identify the abuse long after the packet capture is gone.
+
+
+## References
+
+<a id="ref-1"></a>[1] F. Xu, W. Diao, Z. Li, J. Chen, K. Zhang. BadBluetooth: Breaking Android Security Mechanisms via Malicious Bluetooth Peripherals. Network and Distributed Systems Security (NDSS) Symposium 2019. [https://www.ndss-symposium.org/wp-content/uploads/2019/02/ndss2019_06B-4_Xu_paper.pdf](https://www.ndss-symposium.org/wp-content/uploads/2019/02/ndss2019_06B-4_Xu_paper.pdf)
+
+<a id="ref-2"></a>[2] M. Naveed, X. Zhou, S. Demetriou, X. Wang, C. A. Gunter. Inside Job: Understanding and Mitigating the Threat of External Device Mis-Bonding on Android. Network and Distributed System Security (NDSS) Symposium 2014.
+
+<a id="ref-3"></a>[3] Armis. BlueBorne: The Attack Vector Exposing Almost Every Connected Device. 2017. [https://www.armis.com/research/blueborne/](https://www.armis.com/research/blueborne/)
+
+<a id="ref-4"></a>[4] T. Brewster. Russian Hackers' Lawsuit Reveals Weaknesses In Apple's iOS 16. Forbes, 4 December 2023. [https://www.forbes.com/sites/thomasbrewster/2023/12/04/russian-hacker-lawsuit-exposes-flaws-in-apples-ios-16/](https://www.forbes.com/sites/thomasbrewster/2023/12/04/russian-hacker-lawsuit-exposes-flaws-in-apples-ios-16/)
+
+<a id="ref-5"></a>[5] O. Lautman and A. Luchkov. ICE Is Using Phone Extraction Software Linked to Russia's FSB-Connected Network. Malign Influence Operations (Substack), 18 February 2026. [https://maligninfluenceoperations.substack.com/p/ice-is-using-phone-extraction-software](https://maligninfluenceoperations.substack.com/p/ice-is-using-phone-extraction-software)
+
+<a id="ref-6"></a>[6] Meduza. What a top Russian cyber-forensics conference reveals about the country's ability to hack iPhones and Androids. [https://meduza.io/en/slides/what-a-top-russian-cyber-forensics-conference-reveals-about-the-country-s-ability-to-hack-iphones-and-androids](https://meduza.io/en/slides/what-a-top-russian-cyber-forensics-conference-reveals-about-the-country-s-ability-to-hack-iphones-and-androids)
+
+<a id="ref-7"></a>[7] Insikt Group (Recorded Future). Tracking Deployment of Russian Surveillance Technologies in Central Asia and Latin America. 7 January 2025. [https://assets.recordedfuture.com/insikt-report-pdfs/2025/ta-ru-2025-0107.pdf](https://assets.recordedfuture.com/insikt-report-pdfs/2025/ta-ru-2025-0107.pdf)
+
+<a id="ref-8"></a>[8] A. G. Kulikov, T. N. Kodzov. On the Use of Mobile Device Information Extraction Tools During Operative-Search Activities (К вопросу использования средств извлечения информации из мобильных устройств при проведении оперативно-розыскных мероприятий). Bulletin of the East Siberian Institute of the Ministry of Internal Affairs of Russia, 2024, No. 2, pp. 163-176. [https://vestnikesiirk.ru/ru/nauka/publications/article/6a9c154632807fdbab867fad/](https://vestnikesiirk.ru/ru/nauka/publications/article/6a9c154632807fdbab867fad/)

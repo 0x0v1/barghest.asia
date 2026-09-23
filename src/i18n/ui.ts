@@ -15,7 +15,7 @@ export const ui = {
 		escalate: "Escalate",
 		projects: "Projects",
 		services: "Services",
-		homepage: "Homepage",
+		homepage: "Home",
 		about: "About",
 		tagline: "We make threat intelligence and security research more accessible through open-source tools.",
 		"projects.yours": "Your project",
