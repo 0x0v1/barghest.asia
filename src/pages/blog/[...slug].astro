@@ -18,6 +18,8 @@ const entry = Astro.props;
 const { Content } = await entry.render();
 const site = Astro.site ?? "https://barghest.asia";
 const slug = Astro.params.slug ?? "";
+const allPosts = await getCollection("posts");
+const hasRussianTranslation = allPosts.some((post) => post.slug === `ru/${slug}`);
 const seoTitle = entry.data.seoTitle ?? entry.data.title;
 const seoDescription = entry.data.seoDescription ?? entry.data.description;
 const canonical = new URL(`/blog/${slug}/`, site).toString();
@@ -47,6 +49,12 @@ const seo: AstroSeoProps = {
 		images: [ogImage],
 		site_name: "Barghest",
 	},
+	languageAlternates: hasRussianTranslation
+		? [
+			{ hrefLang: "en", href: canonical },
+			{ hrefLang: "ru", href: new URL(`/ru/blog/${slug}/`, site).toString() },
+		]
+		: [],
 	additionalMetaTags: [
 		{ name: "twitter:title", content: seoTitle },
 		{ name: "twitter:description", content: seoDescription },

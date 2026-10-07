@@ -19,6 +19,7 @@ type Props = {
 const { seo: seoProp, bodyClass, structuredData: pageStructuredData } = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
+const htmlLang = lang === "cn" ? "zh-CN" : lang;
 
 const shareImage = new URL("/images/meta/barghest_share.png", Astro.site).toString();
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
@@ -41,16 +42,30 @@ const structuredData = {
 	],
 };
 
+const localizedSeoDefaults: Record<string, Pick<AstroSeoProps, "title" | "description">> = {
+	cn: {
+		title: "BARGHEST｜面向公民社会的开源移动取证工具",
+		description: "BARGHEST 研究软件漏洞，并为公民社会开发开源移动取证工具。",
+	},
+	ru: {
+		title: "BARGHEST | Открытые инструменты мобильной криминалистики для гражданского общества",
+		description: "BARGHEST исследует уязвимости программного обеспечения и создаёт открытые инструменты мобильной криминалистики для гражданского общества.",
+	},
+};
+
+const defaultTitle = localizedSeoDefaults[lang]?.title ?? "BARGHEST | Open-source forensic tools for civil society";
+const defaultDescription =
+	localizedSeoDefaults[lang]?.description ??
+	"BARGHEST researches software exploitation and builds open-source mobile forensic tools for civil society.";
+
 const defaultSeo: AstroSeoProps = {
-	title: "BARGHEST | Open-source forensic tools for civil society",
-	description:
-		"BARGHEST researches software exploitation and builds open-source mobile forensic tools for civil society.",
+	title: defaultTitle,
+	description: defaultDescription,
 	canonical: "https://barghest.asia",
 	openGraph: {
 		url: "https://barghest.asia",
-		title: "Barghest Research Group",
-		description:
-			"BARGHEST researches software exploitation and builds open-source mobile forensic tools for civil society.",
+		title: defaultTitle,
+		description: defaultDescription,
 		images: [
 			{
 				url: shareImage,
@@ -84,7 +99,7 @@ const seo: AstroSeoProps = {
 	title,
 	description,
 	canonical,
-	noindex: lang !== "en" || seoProp?.noindex,
+	noindex: seoProp?.noindex ?? (lang !== "en"),
 	openGraph: {
 		...defaultSeo.openGraph,
 		...seoProp?.openGraph,
@@ -134,7 +149,7 @@ The Cypherpunks are actively engaged in making the networks safer for privacy. L
 
 Onward.
 -->
-<html lang={lang}>
+<html lang={htmlLang}>
 	<head>
 		<BaseHead />
 		<AstroSeo {...seo} />

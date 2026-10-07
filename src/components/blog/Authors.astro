@@ -2,11 +2,17 @@
 import { getCollection } from "astro:content";
 import { Icon } from "astro-icon/components";
 import Title from "@components/global/Title.astro";
-import { getLangFromUrl, useTranslations, useTranslatedPath } from "@i18n/utils";
+import { getLangFromUrl, useTranslatedPath } from "@i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
+const title = lang === "cn" ? "作者" : lang === "ru" ? "Авторы" : "Authors";
+const subtitle =
+	lang === "cn"
+		? "了解参与 BARGHEST 研究和工具开发的团队。"
+		: lang === "ru"
+			? "Команда, работающая над исследованиями и инструментами BARGHEST."
+			: "People behind BARGHEST research and tools.";
 
 const allAuthors = (await getCollection("authors"))
 	.filter((author) => {
@@ -26,7 +32,7 @@ const allAuthors = (await getCollection("authors"))
 <section>
 	<div class="mx-auto px-8 py-24 md:px-12 lg:pt-32 2xl:max-w-7xl">
 		<div>
-			<Title class="pb-10 pt-20 uppercase" title="Authors" subtitle="lorem ipsum" />
+			<Title class="pb-10 pt-20 uppercase" title={title} subtitle={subtitle} />
 		</div>
 		<div>
 			<ol class="mt-12 flex flex-col divide-y divide-zinc-800 py-8">

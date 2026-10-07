@@ -36,7 +36,12 @@ export default defineConfig({
 		sitemap({
 			filter: (page) => {
 				const pathname = new URL(page).pathname;
-				return !/\/(?:cn|ru)\//.test(pathname) && !["/404/", "/thank-you/"].includes(pathname);
+				const isIndexableRussianTranslation = pathname === "/ru/blog/pbap-device-seizure-sorm/";
+				return (
+					!pathname.startsWith("/cn/") &&
+					(!pathname.startsWith("/ru/") || isIndexableRussianTranslation) &&
+					!["/404/", "/thank-you/", "/mesh/privacy/"].includes(pathname)
+				);
 			},
 		}),
 		mdx(),

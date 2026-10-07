@@ -2,11 +2,17 @@
 import { getCollection } from "astro:content";
 import { Icon } from "astro-icon/components";
 import Title from "@components/global/Title.astro";
-import { getLangFromUrl, useTranslations, useTranslatedPath } from "@i18n/utils";
+import { getLangFromUrl, useTranslatedPath } from "@i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
+const subtitle =
+	lang === "cn"
+		? "浏览 BARGHEST 关于移动安全、间谍软件和数字取证的研究主题。"
+		: lang === "ru"
+			? "Темы исследований BARGHEST о мобильной безопасности и цифровой криминалистике."
+			: "Browse topics covered in BARGHEST security research.";
+const title = lang === "cn" ? "研究主题" : lang === "ru" ? "Темы исследований" : "Research topics";
 const contentLang = "en";
 
 const allPosts = (await getCollection("posts"))
@@ -30,7 +36,7 @@ const tags = [...new Set(allPosts.map((post) => post.data.tags).flat())];
 <section>
 	<div class="mx-auto px-8 py-24 md:px-12 lg:pt-32 2xl:max-w-7xl">
 		<div>
-			<Title class="pb-10 pt-20 uppercase" title="Tags" subtitle="lorem ipsum" />
+			<Title class="pb-10 pt-20 uppercase" title={title} subtitle={subtitle} />
 		</div>
 		<div>
 			<ol class="mt-12 flex flex-col divide-y divide-zinc-800 py-8">

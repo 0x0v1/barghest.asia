@@ -18,9 +18,9 @@ export async function getStaticPaths() {
 const author = Astro.props;
 
 const seo: AstroSeoProps = {
-	title: author.data.name,
+	title: "BARGHEST research team | Open-source security research",
 	description: author.data.description,
-	canonical: `https://barghest.asia/author/${author.slug}/`,
+	canonical: `https://barghest.asia/author/${Astro.params.author}/`,
 };
 ---
 
