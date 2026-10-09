@@ -51,8 +51,8 @@ const seo: AstroSeoProps = {
 	},
 	languageAlternates: hasRussianTranslation
 		? [
-			{ hrefLang: "en", href: canonical },
-			{ hrefLang: "ru", href: new URL(`/ru/blog/${slug}/`, site).toString() },
+			{ hreflang: "en", href: canonical },
+			{ hreflang: "ru", href: new URL(`/ru/blog/${slug}/`, site).toString() },
 		]
 		: [],
 	additionalMetaTags: [

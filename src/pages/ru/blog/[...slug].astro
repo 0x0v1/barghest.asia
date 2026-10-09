@@ -36,8 +36,8 @@ const seo: AstroSeoProps = {
 	noindex: !isTranslated,
 	languageAlternates: isTranslated
 		? [
-			{ hrefLang: "en", href: new URL(`/blog/${slug}/`, site).toString() },
-			{ hrefLang: "ru", href: new URL(`/ru/blog/${slug}/`, site).toString() },
+			{ hreflang: "en", href: new URL(`/blog/${slug}/`, site).toString() },
+			{ hreflang: "ru", href: new URL(`/ru/blog/${slug}/`, site).toString() },
 		]
 		: [],
 };
