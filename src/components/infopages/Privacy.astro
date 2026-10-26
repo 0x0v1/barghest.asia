@@ -1,5 +1,5 @@
 ---
-import Title from "@components/global/Title.astro";
+import KickerPage from "@components/global/KickerPage.astro";
 import { getLangFromUrl, useTranslations, useTranslatedPath } from "@i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
@@ -7,12 +7,8 @@ const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
 ---
 
-<section>
-	<div class="mx-auto max-w-7xl px-8 py-12 md:px-12 lg:px-32 lg:py-32">
-		<div>
-			<Title title="Privacy Policy" subtitle="Last updated January 12, 2026" class="pb-10 pt-20 uppercase" />
-		</div>
-		<div class="prose-styles mt-12 lg:mt-24">
+<KickerPage label="Privacy Policy" note="Last updated January 12, 2026">
+	<div class="blog-post-prose prose-styles !mx-0 max-w-3xl">
 			<h2>Privacy</h2>
 			<p>This privacy policy explains how we handle information when you visit our website.</p>
 
@@ -49,13 +45,12 @@ const translatePath = useTranslatedPath(lang);
 			<p>Since we don't collect any personally identifiable information, there is no personal data to access, modify, or delete. The analytics data we collect is completely anonymous and cannot be traced back to individual users.</p>
 
 			<h2 class="mt-12">Third-party services</h2>
-			<p>We use Umami Cloud (cloud.umami.is) to host our analytics. Umami is GDPR-compliant and does not share data with third parties. You can learn more about Umami's privacy practices at <a href="https://umami.is/docs/privacy" target="_blank" class="text-black hover:underline font-semibold">umami.is/docs/privacy</a>.</p>
+			<p>We use Umami Cloud (cloud.umami.is) to host our analytics. Umami is GDPR-compliant and does not share data with third parties. You can learn more about Umami's privacy practices at <a href="https://umami.is/docs/privacy" target="_blank" class="font-semibold text-white hover:underline">umami.is/docs/privacy</a>.</p>
 
 			<h2 class="mt-12">Contact us</h2>
-			<p>If you have any questions about this privacy policy or our data practices, please contact us at <a href="mailto:info@barghest.asia" class="text-black hover:underline font-semibold">info@barghest.asia</a>.</p>
+			<p>If you have any questions about this privacy policy or our data practices, please contact us at <a href="mailto:info@barghest.asia" class="font-semibold text-white hover:underline">info@barghest.asia</a>.</p>
 
 			<h2 class="mt-12">Changes to this policy</h2>
 			<p>We may update this privacy policy from time to time. Any changes will be posted on this page with an updated revision date.</p>
 		</div>
-	</div>
-</section>
+</KickerPage>

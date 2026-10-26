@@ -1,175 +1,57 @@
 ---
-import { getLangFromUrl, useTranslatedPath, useTranslations } from "@i18n/utils";
-import { Icon } from "astro-icon/components";
 import { Image } from "astro:assets";
-import barghestLogo from "@assets/images/projects/BARGHEST.png";
+import { getLangFromUrl, useTranslatedPath, useTranslations } from "@i18n/utils";
+import wolfHead from "@assets/images/projects/BARGHEST.png";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
-const { pathname } = Astro.url;
-const isResearchPath = /^(?:\/(?:cn|ru))?\/blog(?:\/|$)/.test(pathname);
 ---
 
-<footer class="section gap-y-10 py-12 lg:gap-y-16 lg:py-24">
-	<div class="relative grid grid-cols-6 gap-y-20 lg:grid-cols-12 lg:text-xl">
-		<!-- Logo Section -->
-		<div class="col-span-3 flex items-start lg:col-span-3">
-			<a
-				href={translatePath("/")}
-				class:list={["footer-logo-link block", isResearchPath && "footer-logo-hidden"]}
-				data-footer-logo-target="visible">
-				<Image src={barghestLogo} alt="BARGHEST Logo" class="w-32 opacity-90 transition-opacity duration-200 hover:opacity-100 lg:w-40" />
-			</a>
+<footer class="section !py-12 lg:!py-16">
+	<div class="footer-plain col-span-12 grid w-full gap-10 font-mono text-sm leading-7 text-slate-500 lg:grid-cols-12 lg:gap-16">
+		<!-- Wolf head on the left, as in the original footer -->
+		<a href={translatePath("/")} aria-label="Home" class="footer-wolf block lg:col-span-3">
+			<Image src={wolfHead} alt="BARGHEST" widths={[160, 320]} sizes="160px" class="w-32 opacity-90 transition-opacity hover:opacity-100 lg:w-40" />
+		</a>
+		<div class="space-y-2 lg:col-span-9 lg:col-start-4">
+		<p>
+			<a href={translatePath("/")}>Home</a> ·
+			<a href={translatePath("/about/")}>About</a> ·
+			<a href={translatePath("/research/")}>Research</a> ·
+			<a href={translatePath("/blog/")}>{t("feed.title")}</a> ·
+			<a href={translatePath("/news/")}>Mailing list</a> ·
+			<a href={translatePath("/tags/")}>Tags</a> ·
+			<a href={translatePath("/contact/")}>{t("contacts")}</a> ·
+			<a href={translatePath("/privacy/")}>Privacy</a> ·
+			<a href="/rss.xml">RSS</a>
+		</p>
+		<p>
+			<a href="mailto:info@barghest.asia">info@barghest.asia</a> ·
+			<a href="https://infosec.exchange/@barghest" target="_blank">Mastodon</a> ·
+			<a href="https://x.com/barghestasia" target="_blank">X</a> ·
+			<a href="https://github.com/BARGHEST-ngo" target="_blank">GitHub</a>
+		</p>
+		<p>CC0 No Rights Reserved</p>
 		</div>
-
-		<div class="col-span-6 col-start-1 grid grid-cols-6 gap-6 lg:col-span-9 lg:col-start-4">
-			<div class="footer-links col-span-2 col-start-4 flex flex-col gap-2 lg:col-span-3">
-				<a href="https://infosec.exchange/@barghest" target="_blank">Mastodon</a>
-				<a href="https://x.com/barghestasia" target="_blank">X</a>
-				<a href="https://github.com/BARGHEST-ngo" target="_blank">Github</a>
-			</div>
-			<div class="col-span-3 row-start-1 lg:col-span-2 lg:col-start-4 lg:row-start-auto">
-				<div class="footer-links flex flex-col gap-2">
-					<a href={translatePath("/")} data-footer-logo-target="visible">Home</a>
-					<a href={translatePath("/about/")} data-footer-logo-target="visible">About</a>
-					<a href={translatePath("/blog/")} data-footer-logo-target="hidden">Research</a>
-					<a href={translatePath("/tags/")} data-footer-logo-target="visible">Tags</a>
-					<a href={translatePath("/contact/")} data-footer-logo-target="visible">{t("contacts")}</a>
-					<a href={translatePath("/privacy/")} data-footer-logo-target="visible">Privacy Policy</a>
-					<a href="/rss.xml" data-footer-logo-target="visible">RSS</a>
-				</div>
-			</div>
-			<div class="col-span-3 mt-10 lg:col-start-4">
-				<div class="relative flex flex-col overflow-hidden"></div>
-				<div class="relative mt-1 flex h-8 flex-col overflow-hidden">
-					<a href="mailto:info@barghest.asia" class="block cursor-pointer overflow-hidden">info@barghest.asia</a>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="relative mt-4 flex w-full items-end justify-between gap-y-4 text-sm text-zinc-700">
-		<div>CC0 No Rights Reserved</div>
-		<!-- https://codepen.io/fliseno1k/pen/WNboLBy -->
-		<button
-			id="go-top-button"
-			aria-label="Go to Top"
-			class="fill-transparent transition-colors duration-300 hover:fill-black hover:text-white"
-			data-cursor-hover
-			data-cursor-parallax>
-			<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24">
-				<g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-					<circle cx="12" cy="12" r="9"></circle><path d="m15 12l-3-3m0 0l-3 3m3-3v6"></path>
-				</g>
-			</svg>
-		</button>
-
-		<!-- Scroll Up Arrow -->
 	</div>
 </footer>
 
 <style>
-	footer {
-		@apply relative flex w-full flex-col;
+	.footer-plain a {
+		color: #94a3b8;
+		text-decoration: underline;
+		text-underline-offset: 0.3em;
 	}
-
-	.footer-links a {
-		@apply text-base font-semibold uppercase leading-8 text-zinc-700 transition-colors hover:text-black;
+	.footer-plain a:hover {
+		color: #fff;
 	}
-
-	.footer-logo-link {
-		opacity: 1;
-		visibility: visible;
-		transform: translateY(0);
-		transition:
-			opacity 420ms ease,
-			transform 420ms ease,
-			visibility 0ms linear 0ms;
+	.footer-plain .footer-wolf {
+		text-decoration: none;
 	}
-
-	.footer-logo-link.footer-logo-hidden {
-		opacity: 0;
-		visibility: hidden;
-		pointer-events: none;
-		transform: translateY(0.5rem);
-		transition:
-			opacity 360ms ease,
-			transform 360ms ease,
-			visibility 0ms linear 360ms;
-	}
-
-	.footer-logo-link.footer-logo-no-transition {
-		transition: none;
+	/* The wolf head is black; flip it to white on dark pages */
+	:global(body.site-dark) .footer-wolf img,
+	:global(body.blog-dark-page) .footer-wolf img {
+		filter: invert(1);
 	}
 </style>
-
-<script>
-	import { gsap } from "gsap";
-	import { ScrollToPlugin } from "gsap/ScrollToPlugin";
-
-	gsap.registerPlugin(ScrollToPlugin);
-
-	function init() {
-		var goTopButton = document.getElementById("go-top-button");
-		const footerLogo = document.querySelector<HTMLElement>(".footer-logo-link");
-		const isResearchPage = /^(?:\/(?:cn|ru))?\/blog(?:\/|$)/.test(window.location.pathname);
-
-		if (footerLogo && isResearchPage) {
-			footerLogo.classList.add("footer-logo-hidden");
-			sessionStorage.removeItem("barghestFooterLogoFadeIn");
-		} else if (footerLogo && sessionStorage.getItem("barghestFooterLogoFadeIn") === "true") {
-			sessionStorage.removeItem("barghestFooterLogoFadeIn");
-			footerLogo.classList.add("footer-logo-no-transition", "footer-logo-hidden");
-			window.requestAnimationFrame(() => {
-				footerLogo.classList.remove("footer-logo-no-transition");
-				window.requestAnimationFrame(() => {
-					footerLogo.classList.remove("footer-logo-hidden");
-				});
-			});
-		} else if (footerLogo) {
-			footerLogo.classList.remove("footer-logo-hidden", "footer-logo-no-transition");
-		}
-
-		document.querySelectorAll<HTMLAnchorElement>("a[data-footer-logo-target]").forEach((link) => {
-			function handleFooterLogoTransition(event: MouseEvent) {
-				if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
-					return;
-				}
-
-				const target = link.dataset.footerLogoTarget;
-				const href = link.href;
-				const currentUrl = window.location.href.replace(/#.*$/, "");
-				const nextUrl = href.replace(/#.*$/, "");
-
-				if (!target || currentUrl === nextUrl) {
-					return;
-				}
-
-				event.preventDefault();
-
-				if (target === "hidden") {
-					footerLogo?.classList.add("footer-logo-hidden");
-					window.setTimeout(() => {
-						window.location.href = href;
-					}, 260);
-					return;
-				}
-
-				sessionStorage.setItem("barghestFooterLogoFadeIn", "true");
-				window.location.href = href;
-			}
-
-			link.removeEventListener("click", handleFooterLogoTransition);
-			link.addEventListener("click", handleFooterLogoTransition);
-		});
-
-		if (!goTopButton) return;
-
-		goTopButton.addEventListener("click", function () {
-			gsap.to(window, { duration: 0.5, scrollTo: 0 });
-		});
-	}
-
-	document.removeEventListener("DOMContentLoaded", init); // astro:page-load
-	document.addEventListener("DOMContentLoaded", init); // astro:page-load
-</script>

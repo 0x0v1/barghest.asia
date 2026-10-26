@@ -4,6 +4,8 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import type { AstroSeoProps } from "@astrolib/seo";
 
 const seo: AstroSeoProps = {
+	// Partner-only page: reachable by direct link, hidden from search and site navigation.
+	noindex: true,
 	title: "Мобильная эскалация и ручной анализ | BARGHEST",
 	description: "Руководство BARGHEST по сбору отчётов Android и пакетов iOS sysdiagnose для ручного анализа безопасности мобильных устройств.",
 };

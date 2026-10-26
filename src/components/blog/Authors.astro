@@ -1,7 +1,6 @@
 ---
 import { getCollection } from "astro:content";
-import { Icon } from "astro-icon/components";
-import Title from "@components/global/Title.astro";
+import KickerPage from "@components/global/KickerPage.astro";
 import { getLangFromUrl, useTranslatedPath } from "@i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
@@ -29,26 +28,19 @@ const allAuthors = (await getCollection("authors"))
 	});
 ---
 
-<section>
-	<div class="mx-auto px-8 py-24 md:px-12 lg:pt-32 2xl:max-w-7xl">
-		<div>
-			<Title class="pb-10 pt-20 uppercase" title={title} subtitle={subtitle} />
-		</div>
-		<div>
-			<ol class="mt-12 flex flex-col divide-y divide-zinc-800 py-8">
-				{
-					allAuthors.map((author) => (
-						<li class="w-full py-8 font-mono text-xl font-semibold text-zinc-800 hover:text-black md:text-2xl ">
-							<a href={translatePath(`/author/${author.slug}`)} class="flex w-full items-center justify-between">
-								{author.data.name}{" "}
-								<span class="ml-auto">
-									<Icon name="ic:baseline-arrow-right" width="30" />
-								</span>
-							</a>
-						</li>
-					))
-				}
-			</ol>
-		</div>
-	</div>
-</section>
+<KickerPage label={title} note={subtitle}>
+	<ul class="blog-list">
+		{
+			allAuthors.map((author) => (
+				<li>
+					<a href={translatePath(`/author/${author.slug}`)} class="group block py-8">
+						<p class="font-mono text-lg font-medium uppercase tracking-wide text-slate-100 transition-colors group-hover:text-white lg:text-xl">
+							{author.data.name}
+						</p>
+						<p class="mt-2 max-w-3xl text-base text-slate-400">{author.data.description}</p>
+					</a>
+				</li>
+			))
+		}
+	</ul>
+</KickerPage>

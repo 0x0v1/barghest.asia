@@ -2,7 +2,8 @@
 import { type CollectionEntry } from "astro:content";
 
 import EntriesOne from "@/components/blog/Entry.astro";
-import Title from "@components/global/Title.astro";
+import KickerPage from "@components/global/KickerPage.astro";
+import { getLangFromUrl } from "@i18n/utils";
 
 interface Props {
 	tag: string;
@@ -10,18 +11,16 @@ interface Props {
 }
 
 const { tag, posts } = Astro.props as Props;
+const lang = getLangFromUrl(Astro.url);
+const label = lang === "cn" ? "研究主题" : lang === "ru" ? "Тема" : "Research topic";
 ---
 
-<section>
-	<div class="mx-auto px-8 py-24 md:px-12 lg:pt-32 2xl:max-w-7xl">
-		<div class="py-10">
-			<Title title={tag} subtitle="tag" class="pb-10 pt-20 uppercase" />
-		</div>
-		<ul class="mt-12 grid grid-cols-1 gap-x-3 gap-y-24 sm:grid-cols-2 lg:mt-24 lg:grid-cols-3 lg:gap-x-6">
+<KickerPage label={label} note={tag}>
+		<ul class="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3">
 			{
 				posts.map((post) => (
 					<EntriesOne
-						url={"/blog/" + post.slug}
+						url={"/research/" + post.slug}
 						title={post.data.title}
 						description={post.data.description}
 						alt={post.data.title}
@@ -32,5 +31,4 @@ const { tag, posts } = Astro.props as Props;
 				))
 			}
 		</ul>
-	</div>
-</section>
+</KickerPage>

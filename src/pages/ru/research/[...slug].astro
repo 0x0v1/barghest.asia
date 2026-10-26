@@ -1,0 +1,48 @@
+---
+import { getCollection } from "astro:content";
+import type { AstroSeoProps } from "@astrolib/seo";
+import MarkdownPostLayout from "@layouts/MarkdownPostLayout.astro";
+
+export async function getStaticPaths() {
+	const blogEntries = await getCollection("posts");
+
+	// Russian translations keyed by bare slug; a post gains one by adding
+	// posts/ru/<slug>.mdx. Routes are still enumerated from the canonical
+	// English collection, so untranslated posts keep serving English here.
+	const ruBySlug = new Map(
+		blogEntries
+			.filter((entry) => entry.slug.split("/")[0] === "ru")
+			.map((entry) => [entry.slug.split("/").slice(1).join("/"), entry]),
+	);
+
+	return blogEntries
+		.map((entry) => {
+			const [lang, ...slug] = entry.slug.split("/");
+			return { params: { lang, slug: slug.join("/") || undefined }, props: entry };
+		})
+		.filter((entry) => entry.params.lang === "en")
+		.map(({ params, props }) => ({ params, props: ruBySlug.get(params.slug ?? "") ?? props }));
+}
+
+const entry = Astro.props;
+const { Content } = await entry.render();
+const site = Astro.site ?? "https://barghest.asia";
+const slug = Astro.params.slug ?? "";
+const isTranslated = entry.slug.startsWith("ru/");
+
+const seo: AstroSeoProps = {
+	title: entry.data.title,
+	description: entry.data.seoDescription ?? entry.data.description,
+	noindex: !isTranslated,
+	languageAlternates: isTranslated
+		? [
+			{ hreflang: "en", href: new URL(`/research/${slug}/`, site).toString() },
+			{ hreflang: "ru", href: new URL(`/ru/research/${slug}/`, site).toString() },
+		]
+		: [],
+};
+---
+
+<MarkdownPostLayout frontmatter={entry.data} body={entry.body} seo={seo}>
+	<Content />
+</MarkdownPostLayout>

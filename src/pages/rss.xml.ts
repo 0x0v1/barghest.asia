@@ -29,7 +29,7 @@ export async function GET(context: any) {
 			author: post.data.author.name,
 			categories: post.data.tags,
 			// Compute RSS link from post `slug` without language prefix
-			link: `/blog/${post.cleanSlug}/`,
+			link: `/research/${post.cleanSlug}/`,
 		})),
 		customData: `<language>en-us</language>`,
 	});

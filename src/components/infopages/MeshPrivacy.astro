@@ -1,13 +1,9 @@
 ---
-import Title from "@components/global/Title.astro";
+import KickerPage from "@components/global/KickerPage.astro";
 ---
 
-<section>
-	<div class="mx-auto max-w-7xl px-8 py-12 md:px-12 lg:px-32 lg:py-32">
-		<div>
-			<Title title="Privacy Policy" subtitle="Mesh | Last updated April 2026" class="pb-10 pt-20" subtitleClass="" />
-		</div>
-		<div class="prose-styles mt-12 lg:mt-24">
+<KickerPage label="Privacy Policy" note="Mesh | Last updated April 2026">
+	<div class="blog-post-prose prose-styles !mx-0 max-w-3xl">
 			<h2>1. Overview</h2>
 			<p>
 				Mesh is an open-source mobile forensics and secure networking tool developed by Barghest. It enables encrypted peer-to-peer
@@ -160,11 +156,11 @@ import Title from "@components/global/Title.astro";
 			<h2 class="mt-12">14. Contact</h2>
 			<ul>
 				<li>
-					GitHub: <a href="https://github.com/BARGHEST-ngo/MESH" target="_blank" class="font-semibold text-black hover:underline">
+					GitHub: <a href="https://github.com/BARGHEST-ngo/MESH" target="_blank" class="font-semibold text-white hover:underline">
 						github.com/BARGHEST-ngo/MESH
 					</a>
 				</li>
-				<li>Website: <a href="https://barghest.asia" class="font-semibold text-black hover:underline">barghest.asia</a></li>
+				<li>Website: <a href="https://barghest.asia" class="font-semibold text-white hover:underline">barghest.asia</a></li>
 			</ul>
 
 			<h2 class="mt-12">15. Summary</h2>
@@ -176,5 +172,4 @@ import Title from "@components/global/Title.astro";
 				<li>Operators are responsible for lawful and secure use</li>
 			</ul>
 		</div>
-	</div>
-</section>
+</KickerPage>

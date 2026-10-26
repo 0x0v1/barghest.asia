@@ -1,0 +1,36 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getLangFromUrl } from "@i18n/utils";
+
+interface Props {
+	post: CollectionEntry<"news">;
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+const lang = getLangFromUrl(Astro.url);
+const dateLocale = lang === "cn" ? "zh-CN" : lang === "ru" ? "ru-RU" : "en-GB";
+---
+
+<section class="blog-post">
+	<article class="blog-post-shell mx-auto px-8 py-16 md:px-12 lg:py-28">
+		<header class="blog-post-header pt-16">
+			<h1 class="blog-post-title font-mono text-3xl font-semibold leading-tight text-slate-100 md:text-4xl">{post.data.title}</h1>
+			<div class="blog-post-meta mt-5 font-mono text-sm text-slate-500">
+				<time datetime={post.data.pubDate.toISOString()}>
+					{post.data.pubDate.toLocaleDateString(dateLocale, { day: "numeric", month: "long", year: "numeric" })}
+				</time>
+				{
+					post.data.authors?.map((author, i) => (
+						// Kept on one line so no stray space appears before the comma
+						<span>{i === 0 ? " · " : ", "}{author.link ? <a href={author.link} rel="author" class="underline underline-offset-4 hover:text-slate-300">{author.name}</a> : author.name}</span>
+					))
+				}
+			</div>
+			{post.data.description && <p class="blog-post-description mt-8 text-base leading-7 text-slate-400">{post.data.description}</p>}
+		</header>
+		<div class="blog-post-prose prose-styles mt-12">
+			<Content />
+		</div>
+	</article>
+</section>

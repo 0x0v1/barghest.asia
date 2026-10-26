@@ -11,6 +11,9 @@ export default defineConfig({
 			watch: {
 				usePolling: true,
 			},
+			fs: {
+				allow: ["..", "../mintaka/node_modules"],
+			},
 		},
 	},
 	site: "https://barghest.asia",
@@ -36,11 +39,11 @@ export default defineConfig({
 		sitemap({
 			filter: (page) => {
 				const pathname = new URL(page).pathname;
-				const isIndexableRussianTranslation = pathname === "/ru/blog/pbap-device-seizure-sorm/";
+				const isIndexableRussianTranslation = pathname === "/ru/research/pbap-device-seizure-sorm/";
 				return (
 					!pathname.startsWith("/cn/") &&
 					(!pathname.startsWith("/ru/") || isIndexableRussianTranslation) &&
-					!["/404/", "/thank-you/", "/mesh/privacy/"].includes(pathname)
+					!["/404/", "/thank-you/", "/mesh/privacy/", "/escalation/"].includes(pathname)
 				);
 			},
 		}),

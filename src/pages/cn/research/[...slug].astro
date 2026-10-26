@@ -1,0 +1,28 @@
+---
+import { getCollection } from "astro:content";
+import type { AstroSeoProps } from "@astrolib/seo";
+import MarkdownPostLayout from "@layouts/MarkdownPostLayout.astro";
+
+export async function getStaticPaths() {
+	const blogEntries = await getCollection("posts");
+
+	return blogEntries
+		.map((entry) => {
+			const [lang, ...slug] = entry.slug.split("/");
+			return { params: { lang, slug: slug.join("/") || undefined }, props: entry };
+		})
+		.filter((entry) => entry.params.lang === "en");
+}
+
+const entry = Astro.props;
+const { Content } = await entry.render();
+
+const seo: AstroSeoProps = {
+	title: entry.data.title,
+	description: entry.data.description,
+};
+---
+
+<MarkdownPostLayout frontmatter={entry.data} body={entry.body} seo={seo}>
+	<Content />
+</MarkdownPostLayout>

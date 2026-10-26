@@ -1,0 +1,46 @@
+---
+import { getLangFromUrl, useTranslatedPath } from "@i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const translatePath = useTranslatedPath(lang);
+
+const services = [
+	{
+		title: "Mobile forensics",
+		content: "Android evidence collection, device triage and spyware investigation for people and organisations at risk.",
+		link: "/work/ward",
+	},
+	{
+		title: "Vulnerability research",
+		content: "Reverse engineering, exploitation research and coordinated disclosure of flaws in the software civil society relies on.",
+		link: "/research/",
+	},
+	{
+		title: "Open tooling",
+		content: "Self-hostable tools we build in-house and publish in the open. Evidence stays with the communities that collect it.",
+		link: "/work/mesh",
+	},
+	{
+		title: "Incident response",
+		content: "Support for journalists, activists and NGOs who suspect a device has been compromised.",
+		link: "/contact/",
+	},
+];
+---
+
+<section id="services" class="section !py-24 lg:!py-36">
+	<div class="col-span-12 mx-auto w-full max-w-7xl">
+		<h2 class="section-title">What we do</h2>
+		<div class="mt-16 grid gap-x-16 gap-y-14 md:grid-cols-2 lg:mt-20">
+			{
+				services.map(({ title, content, link }) => (
+					<a href={translatePath(link)} class="service group block">
+						<h3 class="text-2xl font-semibold text-white lg:text-3xl">{title}</h3>
+						<p class="mt-4 max-w-lg text-lg leading-8 text-slate-400">{content}</p>
+						<span class="text-link mt-6 inline-block">Learn more</span>
+					</a>
+				))
+			}
+		</div>
+	</div>
+</section>

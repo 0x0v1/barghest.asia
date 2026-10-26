@@ -1,28 +1,17 @@
 ---
 import { getCollection } from "astro:content";
-import type { AstroSeoProps } from "@astrolib/seo";
-import MarkdownPostLayout from "@layouts/MarkdownPostLayout.astro";
+import NewsPost from "@components/news/NewsPost.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
 
 export async function getStaticPaths() {
-	const blogEntries = await getCollection("posts");
-
-	return blogEntries
-		.map((entry) => {
-			const [lang, ...slug] = entry.slug.split("/");
-			return { params: { lang, slug: slug.join("/") || undefined }, props: entry };
-		})
-		.filter((entry) => entry.params.lang === "en");
+	return (await getCollection("news"))
+		.filter((post) => post.slug.split("/")[0] === "en")
+		.map((post) => ({ params: { slug: post.slug.split("/").slice(1).join("/") }, props: { post } }));
 }
 
-const entry = Astro.props;
-const { Content } = await entry.render();
-
-const seo: AstroSeoProps = {
-	title: entry.data.title,
-	description: entry.data.description,
-};
+const { post } = Astro.props;
 ---
 
-<MarkdownPostLayout frontmatter={entry.data} body={entry.body} seo={seo}>
-	<Content />
-</MarkdownPostLayout>
+<BaseLayout seo={{ title: `${post.data.title} | BARGHEST`, description: post.data.description }} bodyClass="blog-dark-page">
+	<NewsPost post={post} />
+</BaseLayout>

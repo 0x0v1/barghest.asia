@@ -1,0 +1,11 @@
+---
+const { title, lead } = Astro.props;
+---
+
+<header class="section !pb-16 !pt-36 lg:!pb-24 lg:!pt-52">
+	<div class="col-span-12 mx-auto w-full max-w-7xl">
+		<h1 class="section-title !text-[clamp(3rem,9vw,8rem)]">{title}</h1>
+		{lead && <p class="mt-10 max-w-3xl text-xl leading-9 text-slate-300 lg:text-2xl lg:leading-10">{lead}</p>}
+		<slot />
+	</div>
+</header>

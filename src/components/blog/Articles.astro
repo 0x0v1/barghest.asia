@@ -45,7 +45,7 @@ const allPosts = collection
 		{
 			allPosts && allPosts[0] && (
 				<Entry
-					url={"/blog/" + allPosts[0].slug}
+					url={"/research/" + allPosts[0].slug}
 					title={allPosts[0].data.title}
 					description={allPosts[0].data.description}
 					alt={allPosts[0].data.title}
@@ -63,7 +63,7 @@ const allPosts = collection
 					.slice(1)
 					.map((post) => (
 						<Entry
-							url={"/blog/" + post.slug}
+							url={"/research/" + post.slug}
 							title={post.data.title}
 							description={post.data.description}
 							alt={post.data.title}

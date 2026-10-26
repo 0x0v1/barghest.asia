@@ -1,12 +1,9 @@
 ---
-import Title from "@components/global/Title.astro";
+import KickerPage from "@components/global/KickerPage.astro";
 ---
 
-<section>
-	<div class="mx-auto max-w-7xl px-8 py-12 md:px-12 lg:px-32 lg:py-32">
-		<Title title="Research and DFIR privacy policy" subtitle="Effective date: 24/03/2026" class="pb-10 pt-20 uppercase" />
-
-		<div class="prose-styles mt-12 lg:mt-24">
+<KickerPage label="Research and DFIR privacy policy" note="Effective date: 24/03/2026">
+	<div class="blog-post-prose prose-styles !mx-0 max-w-3xl">
 			<h2>Overview</h2>
 			<p>
 				BARGHEST conducts security research, reverse engineering, incident response, penetration testing, digital forensic investigations, and
@@ -115,7 +112,7 @@ import Title from "@components/global/Title.astro";
 			<p>
 				If you discover a vulnerability in our tools or infrastructure, report it to <a
 					href="mailto:info@barghest.asia"
-					class="font-semibold text-black hover:underline">
+					class="font-semibold text-white hover:underline">
 					info@barghest.asia
 				</a>. Include a description of the issue, steps to reproduce, affected versions or components, and any proof-of-concept where
 				appropriate.
@@ -124,5 +121,4 @@ import Title from "@components/global/Title.astro";
 			<h2 class="mt-12">Updates to this policy</h2>
 			<p>We may update this policy periodically. Updates will be published with a revised effective date.</p>
 		</div>
-	</div>
-</section>
+</KickerPage>

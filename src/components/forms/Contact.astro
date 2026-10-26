@@ -1,36 +1,30 @@
 ---
-import Title from "@components/global/Title.astro";
-
-import { getLangFromUrl, useTranslations, useTranslatedPath } from "@i18n/utils";
+import { getLangFromUrl, useTranslations } from "@i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-const translatePath = useTranslatedPath(lang);
 ---
 
-<section class="isolate px-6 py-24 sm:py-32 lg:px-8">
-	<div class="absolute inset-x-0 top-[-10rem] transform-gpu overflow-hidden blur-3xl sm:top-[-20rem]" aria-hidden="true">
-		<div class="gradient-element"></div>
-	</div>
-	<div class="mx-auto">
-		<Title class="pb-10 pt-20 uppercase" title={t("contact.title")} subtitle={t("contact.subtitle")} />
-		<div class="mx-auto max-w-2xl pt-12 lg:pt-20 text-center">
-			<div class="bg-slate-100 rounded-lg p-8 border border-slate-200">
-				<h3 class="text-2xl font-semibold text-gray-900 mb-4">Get in Touch</h3>
-
-				<p class="text-lg text-gray-600 mb-6">Please contact us at:</p>
-				<a
-					href="mailto:info@barghest.asia"
-					class="inline-block text-3xl font-bold text-black hover:text-gray-800 transition-colors duration-200 underline decoration-2 underline-offset-4"
-				>
-					info@barghest.asia
-				</a>
-
-				<div class="mt-8 pt-8 border-t border-slate-300">
-					<h4 class="text-xl font-semibold text-gray-900 mb-4">PGP Public Key</h4>
-					<p class="text-sm text-gray-600 mb-4">For secure communications, use our PGP key:</p>
-					<div class="bg-white rounded-md p-4 border border-slate-300">
-						<pre class="text-left text-xs font-mono text-gray-800 overflow-x-auto whitespace-pre-wrap break-all">-----BEGIN PGP PUBLIC KEY BLOCK-----
+<section class="blog-index">
+	<div class="mx-auto flex flex-col gap-16 px-8 py-24 md:px-12 lg:pt-32 2xl:max-w-7xl">
+		<div class="blog-kicker pt-20">
+			<p class="font-mono text-xs font-semibold uppercase text-slate-400">{t("contact.title")}</p>
+		</div>
+		<div>
+			<a
+				href="mailto:info@barghest.asia"
+				class="inline-block break-all text-2xl font-semibold text-white underline decoration-1 underline-offset-[0.3em] transition hover:decoration-2 lg:text-4xl">
+				info@barghest.asia
+			</a>
+			<p class="mt-6 max-w-2xl text-lg leading-8 text-slate-400">{t("contact.subtitle")}</p>
+		</div>
+		<div class="max-w-4xl">
+			<div class="flex flex-wrap items-baseline justify-between gap-4">
+				<h2 class="text-2xl font-semibold text-white lg:text-3xl">PGP public key</h2>
+				<button type="button" id="copy-pgp" class="text-link">Copy key</button>
+			</div>
+			<p class="mt-5 text-lg leading-8 text-slate-400">Encrypt anything sensitive to this key before sending.</p>
+			<pre id="pgp-key" class="mt-8 overflow-x-auto whitespace-pre-wrap break-all rounded-lg bg-zinc-950 p-6 font-mono text-xs leading-6 text-slate-300">-----BEGIN PGP PUBLIC KEY BLOCK-----
 
 xjMEaR7oFBYJKwYBBAHaRw8BAQdA7KWt5mzZqLpFODfrbW4d+GMJwlBZN4BC
 097N9IlGq87NJ2luZm9AYmFyZ2hlc3QuYXNpYSA8aW5mb0BiYXJnaGVzdC5h
@@ -47,35 +41,25 @@ RFTK7Gr/3R63mQPeOOiYic6DzCqPusEtfGBCAP9reiLCHERjBkgMtFgKbojm
 d7PjmQcXQJvPBxnUszDMDw==
 =SmiC
 -----END PGP PUBLIC KEY BLOCK-----</pre>
-					</div>
-				</div>
-			</div>
 		</div>
 	</div>
 </section>
 
-<style>
-	.gradient-element {
-		@apply relative left-1/2 -z-10 aspect-[1155/678] w-[36.125rem] max-w-none -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-40rem)] sm:w-[72.1875rem];
-		clip-path: polygon(
-			74.1% 44.1%,
-			100% 61.6%,
-			97.5% 26.9%,
-			85.5% 0.1%,
-			80.7% 2%,
-			72.5% 32.5%,
-			60.2% 62.4%,
-			52.4% 68.1%,
-			47.5% 58.3%,
-			45.2% 34.5%,
-			27.5% 76.7%,
-			0.1% 64.9%,
-			17.9% 100%,
-			27.6% 76.8%,
-			76.1% 97.7%,
-			74.1% 44.1%
-		);
+<script>
+	function init() {
+		const button = document.getElementById("copy-pgp");
+		const key = document.getElementById("pgp-key");
+		if (!button || !key) return;
+		button.addEventListener("click", async () => {
+			try {
+				await navigator.clipboard.writeText(key.textContent ?? "");
+				button.textContent = "Copied";
+				window.setTimeout(() => (button.textContent = "Copy key"), 2000);
+			} catch {
+				button.textContent = "Select and copy manually";
+			}
+		});
 	}
 
-
-</style>
+	document.addEventListener("DOMContentLoaded", init);
+</script>

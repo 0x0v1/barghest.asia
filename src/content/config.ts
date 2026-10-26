@@ -22,6 +22,22 @@ const postsCollection = defineCollection({
 		}),
 });
 
+const newsCollection = defineCollection({
+	schema: z.object({
+		title: z.string(),
+		pubDate: z.date(),
+		description: z.string().optional(),
+		authors: z
+			.array(
+				z.object({
+					name: z.string(),
+					link: z.string().optional(),
+				}),
+			)
+			.optional(),
+	}),
+});
+
 const projectsCollection = defineCollection({
 	schema: ({ image }) =>
 		z.object({
@@ -57,6 +73,7 @@ const authorsCollection = defineCollection({
 
 export const collections = {
 	posts: postsCollection,
+	news: newsCollection,
 	projects: projectsCollection,
 	authors: authorsCollection,
 };
