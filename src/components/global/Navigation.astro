@@ -2,7 +2,7 @@
 import { Image } from "astro:assets";
 import { Icon } from "astro-icon/components";
 import { getLangFromUrl, getUrlWithoutLang, useTranslations, useTranslatedPath } from "@i18n/utils";
-import smallLogo from "@assets/images/global/smalllogo.png";
+import brandLogo from "@assets/images/global/brand-logo-7.png";
 
 const isDev = import.meta.env.DEV;
 
@@ -27,11 +27,15 @@ let pages = [
 	},
 	{
 		title: t("blog.title"),
+		url: "/research/",
+	},
+	{
+		title: t("feed.title"),
 		url: "/blog/",
 	},
 	{
-		title: t("escalate"),
-		url: "/escalation/",
+		title: t("news.title"),
+		url: "/news/",
 	},
 	{
 		title: t("contacts"),
@@ -47,7 +51,7 @@ let pages = [
 // }
 
 const { pathname } = Astro.url;
-const isResearchPath = /^(?:\/(?:cn|ru))?\/blog(?:\/|$)/.test(pathname);
+const isEditorialIndexPath = /^(?:\/(?:cn|ru))?\/(?:research|blog|news|about|contact|tags|author|privacy|research-privacy|mesh\/privacy)(?:\/|$)/.test(pathname);
 const localePrefix = /^\/(?:cn|ru)(?=\/|$)/;
 ---
 
@@ -56,14 +60,16 @@ const localePrefix = /^\/(?:cn|ru)(?=\/|$)/;
 		href={translatePath("/")}
 		aria-label="Home"
 		data-logo-target="visible"
-		class:list={["logo absolute z-50 flex h-[4.5rem] items-center md:h-[5.9rem]", isResearchPath && "logo-hidden"]}>
-		<Image src={smallLogo} alt="BARGHEST Logo" class="logo-svg block h-auto w-56 md:w-72" />
+		class:list={["logo absolute z-50 flex items-start", isEditorialIndexPath && "logo-hidden"]}>
+		<span class="brand-logo block h-11 pt-1 md:h-14 lg:h-16">
+			<Image src={brandLogo} alt="BARGHEST Research Group" widths={[240, 480, 720]} sizes="186px" loading="eager" />
+		</span>
 	</a>
-	<div data-xdata="{ open: false }" class="navigation fixed right-0 top-0 z-50" data-xbind.class="{'w-full navbar-open': open}">
+	<div data-xdata="{ open: false }" class="navigation absolute right-0 top-0 z-50" data-xbind.class="{'w-full navbar-open': open}">
 		<div class="ml-auto md:max-w-fit" data-xbind.class="{'max-w-3xl': open, 'max-w-[8rem]': !open }">
 			<div class="mx-auto w-full">
 				<div
-					class="shadow-thick resizable nav-container squircle relative mx-auto flex w-full flex-col justify-center overflow-x-hidden bg-zinc-900 backdrop-blur-xl backdrop-filter md:flex-row-reverse">
+					class="nav-container relative mx-auto flex w-full flex-col justify-center overflow-x-hidden bg-zinc-950 md:flex-row-reverse md:bg-transparent">
 					<div class="flex flex-row items-center justify-end md:hidden">
 						<a
 							class="px-3 py-[0.4rem] pl-4"
@@ -105,16 +111,16 @@ const localePrefix = /^\/(?:cn|ru)(?=\/|$)/;
 									<li data-cursor-hover>
 										<a
 											href={translatePath(page.url)}
-											data-logo-target={page.url === "/blog/" ? "hidden" : "visible"}
+											data-logo-target={["/research/", "/blog/", "/news/", "/about/", "/contact/"].includes(page.url) ? "hidden" : "visible"}
 											class={`inline-block cursor-pointer px-1 py-[0.33rem] ${
 												page.url === pathname ||
 												page.url === pathname.replace(localePrefix, "") ||
-												(page.url === "/blog/" && isResearchPath)
+												((["/research/", "/blog/", "/news/", "/about/", "/contact/"].includes(page.url)) && isEditorialIndexPath && pathname.replace(localePrefix, "").startsWith(page.url))
 													? "active"
 													: ""
 											}`}>
 											<span class="menu-item-container inline-block">
-												<span class="menu-item px-4 py-1 text-base font-semibold uppercase leading-8 text-zinc-400 hover:text-white focus:text-white focus:shadow-none focus:outline-none">
+												<span class="menu-item px-2 py-1 text-sm font-normal leading-8 text-zinc-400 hover:text-white focus:text-white focus:shadow-none focus:outline-none">
 													{page.title}
 												</span>
 											</span>
@@ -146,12 +152,6 @@ const localePrefix = /^\/(?:cn|ru)(?=\/|$)/;
 </header>
 
 <style>
-	.navigation {
-		mix-blend-mode: difference;
-	}
-	.navigation.navbar-open {
-		mix-blend-mode: luminosity;
-	}
 	.logo {
 		opacity: 1;
 		visibility: visible;
@@ -171,6 +171,23 @@ const localePrefix = /^\/(?:cn|ru)(?=\/|$)/;
 			transform 360ms ease,
 			visibility 0ms linear 360ms;
 	}
+	.logo {
+		z-index: 2999;
+	}
+	.brand-logo {
+		color: #040404;
+	}
+	:global(body.site-dark) .brand-logo {
+		color: #fff;
+	}
+	.brand-logo :global(img) {
+		display: block;
+		height: 100%;
+		width: auto;
+	}
+	:global(body.site-dark) .brand-logo :global(img) {
+		filter: invert(1);
+	}
 	.logo.logo-no-transition {
 		transition: none;
 	}
@@ -179,9 +196,6 @@ const localePrefix = /^\/(?:cn|ru)(?=\/|$)/;
 		padding: 1rem var(--base-padding-x);
 	}
 	@media (max-width: 539px) {
-		.logo-svg {
-			width: clamp(8rem, 40vw, 10.5rem);
-		}
 	}
 	@media (min-width: 768px) {
 		.navigation,
@@ -204,27 +218,11 @@ const localePrefix = /^\/(?:cn|ru)(?=\/|$)/;
 	.collapsed .resizable:before {
 		opacity: 1;
 	}
-	nav a .menu-item-container {
-		border-radius: 0.45rem;
-	}
-	nav a.active .menu-item-container,
-	nav a:hover .menu-item-container {
-		transition: background-color 0.3s ease;
-	}
-	nav ul:not(.collapsed) a.active .menu-item-container {
-		transition-duration: 0.5s;
-		background: #aaa;
-	}
-	nav ul:not(.collapsed) a:hover .menu-item-container {
-		background: #fff;
-	}
-	nav ul:not(.collapsed) a.active .menu-item-container .menu-item,
-	nav ul:not(.collapsed) a:hover .menu-item-container .menu-item {
-		color: #000;
-	}
-	nav ul.collapsed a.active .menu-item-container .menu-item,
-	nav ul.collapsed a:hover .menu-item-container .menu-item {
+	/* sourcehut-style: plain text links, current page underlined */
+	nav a.active .menu-item {
 		color: #fff;
+		text-decoration: underline;
+		text-underline-offset: 0.35em;
 	}
 </style>
 
@@ -233,7 +231,7 @@ const localePrefix = /^\/(?:cn|ru)(?=\/|$)/;
 
 	function init() {
 		const logo = document.querySelector<HTMLElement>("header .logo");
-		const isResearchPage = /^(?:\/(?:cn|ru))?\/blog(?:\/|$)/.test(window.location.pathname);
+		const isResearchPage = /^(?:\/(?:cn|ru))?\/(?:research|blog|news|about|contact|tags|author|privacy|research-privacy|mesh\/privacy)(?:\/|$)/.test(window.location.pathname);
 
 		if (logo && isResearchPage) {
 			logo.classList.add("logo-hidden");
@@ -286,6 +284,9 @@ const localePrefix = /^\/(?:cn|ru)(?=\/|$)/;
 			link.addEventListener("click", handleLogoTransition);
 		});
 
+		// sourcehut-style: no shrink-on-scroll animation
+		return;
+
 		let isHoveringMenu = false;
 		let menuCollapsed = false;
 
@@ -315,7 +316,7 @@ const localePrefix = /^\/(?:cn|ru)(?=\/|$)/;
 
 						if (pathName === "/" || pathName === "/cn/" || pathName === "/ru/") {
 							return "9.5rem";
-						} else if (/^(?:\/(?:cn|ru))?\/blog(?:\/|$)/.test(pathName)) {
+						} else if (/^(?:\/(?:cn|ru))?\/(?:research|blog|news|about|contact|tags|author|privacy|research-privacy|mesh\/privacy)(?:\/|$)/.test(pathName)) {
 							return "3.5rem";
 						}
 

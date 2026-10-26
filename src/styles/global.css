@@ -351,6 +351,76 @@ body.blog-dark-page > footer a {
 	color: #d8dee9;
 }
 
+html:has(body.site-dark),
+html:has(body.blog-dark-page) {
+	background: #000;
+}
+
+body.site-dark footer .footer-links a {
+	color: #94a3b8;
+}
+
+body.site-dark footer .footer-links a:hover {
+	color: #fff;
+}
+
+body.site-dark .logo-svg,
+body.site-dark .footer-logo-link img {
+	filter: invert(1);
+}
+
+.section-title,
+.font-display {
+	font-family: "Midnight", "Inter var", "Inter", sans-serif;
+	font-weight: 900;
+	font-synthesis: none;
+}
+
+.section-title {
+	font-size: clamp(2.5rem, 6vw, 5rem);
+	line-height: 0.95;
+	text-transform: uppercase;
+	color: #fff;
+}
+
+/* sourcehut-style: buttons and links are plain underlined text with a "=>" marker */
+.btn,
+.text-link {
+	display: inline;
+	font-size: 1rem;
+	font-weight: 400;
+	text-transform: none;
+	color: #e2e8f0;
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.3em;
+}
+
+.btn::before,
+.text-link::before {
+	content: "=> ";
+	text-decoration: none;
+	display: inline-block;
+	white-space: pre;
+	color: #64748b;
+	font-family: theme("fontFamily.mono");
+	font-variant-ligatures: none;
+}
+
+.btn:hover,
+.text-link:hover,
+.group:hover .text-link {
+	color: #fff;
+}
+
+.project-card img {
+	transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.project-card:hover img {
+	transform: translateY(-0.4rem);
+}
+
 .section {
 	position: relative;
 	width: 100%;

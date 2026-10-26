@@ -1,5 +1,4 @@
 ---
-import BlobCursorFollower from "@/components/global/BlobCursorFollower.astro";
 import AutoTranslate from "@/components/global/AutoTranslate.astro";
 import { AstroSeo, type AstroSeoProps } from "@astrolib/seo";
 import BaseHead from "@components/BaseHead.astro";
@@ -116,10 +115,6 @@ const seo: AstroSeoProps = {
 	additionalLinkTags: [...(defaultSeo.additionalLinkTags ?? []), ...(seoProp?.additionalLinkTags ?? [])],
 };
 
-function cursorFollowerActive() {
-	const paths = ["", "/", "/it/", "/it"];
-	return paths.includes(pathname);
-}
 ---
 
 <!--
@@ -160,7 +155,6 @@ Onward.
 		<AutoTranslate />
 		<BackgroundTexture />
 		<Navigation />
-		{cursorFollowerActive() && <BlobCursorFollower />}
 		<slot />
 		<Footer />
 	</body>

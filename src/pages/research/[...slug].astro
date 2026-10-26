@@ -1,0 +1,92 @@
+---
+import { getCollection } from "astro:content";
+import type { AstroSeoProps } from "@astrolib/seo";
+import MarkdownPostLayout from "../../layouts/MarkdownPostLayout.astro";
+
+export async function getStaticPaths() {
+	const blogEntries = await getCollection("posts");
+
+	return blogEntries
+		.map((entry) => {
+			const [lang, ...slug] = entry.slug.split("/");
+			return { params: { lang, slug: slug.join("/") || undefined }, props: entry };
+		})
+		.filter((entry) => entry.params.lang === "en");
+}
+
+const entry = Astro.props;
+const { Content } = await entry.render();
+const site = Astro.site ?? "https://barghest.asia";
+const slug = Astro.params.slug ?? "";
+const allPosts = await getCollection("posts");
+const hasRussianTranslation = allPosts.some((post) => post.slug === `ru/${slug}`);
+const seoTitle = entry.data.seoTitle ?? entry.data.title;
+const seoDescription = entry.data.seoDescription ?? entry.data.description;
+const canonical = new URL(`/research/${slug}/`, site).toString();
+const ogImage = entry.data.socialImage
+	? {
+			url: new URL(entry.data.socialImage, site).toString(),
+			width: 1200,
+			height: 630,
+			alt: `${seoTitle} | Read the full write-up`,
+			type: "image/png",
+		}
+	: {
+			url: new URL(entry.data.image.source.src, site).toString(),
+			width: entry.data.image.source.width,
+			height: entry.data.image.source.height,
+			alt: entry.data.image.alt,
+		};
+
+const seo: AstroSeoProps = {
+	title: seoTitle,
+	description: seoDescription,
+	canonical,
+	openGraph: {
+		url: canonical,
+		title: seoTitle,
+		description: seoDescription,
+		images: [ogImage],
+		site_name: "Barghest",
+	},
+	languageAlternates: hasRussianTranslation
+		? [
+			{ hreflang: "en", href: canonical },
+			{ hreflang: "ru", href: new URL(`/ru/research/${slug}/`, site).toString() },
+		]
+		: [],
+	additionalMetaTags: [
+		{ name: "twitter:title", content: seoTitle },
+		{ name: "twitter:description", content: seoDescription },
+		{ name: "twitter:image", content: ogImage.url },
+		{ name: "twitter:image:alt", content: ogImage.alt },
+	],
+};
+
+const articleStructuredData = {
+	"@context": "https://schema.org",
+	"@type": "Article",
+	headline: seoTitle,
+	description: seoDescription,
+	image: ogImage.url,
+	datePublished: entry.data.pubDate.toISOString(),
+	dateModified: entry.data.pubDate.toISOString(),
+	mainEntityOfPage: canonical,
+	author: {
+		"@type": "Organization",
+		name: entry.data.author.name,
+	},
+	publisher: {
+		"@type": "Organization",
+		name: "BARGHEST",
+		logo: {
+			"@type": "ImageObject",
+			url: new URL("/images/meta/barghest_share.png", site).toString(),
+		},
+	},
+};
+---
+
+<MarkdownPostLayout frontmatter={entry.data} body={entry.body} seo={seo} structuredData={articleStructuredData}>
+	<Content />
+</MarkdownPostLayout>

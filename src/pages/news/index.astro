@@ -1,0 +1,14 @@
+---
+import type { AstroSeoProps } from "@astrolib/seo";
+import Signup from "@components/news/Signup.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+const seo: AstroSeoProps = {
+	title: "News | BARGHEST",
+	description: "How to subscribe to the BARGHEST mailing list.",
+};
+---
+
+<BaseLayout seo={seo} bodyClass="blog-dark-page">
+	<Signup />
+</BaseLayout>

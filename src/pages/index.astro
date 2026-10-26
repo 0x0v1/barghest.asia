@@ -1,12 +1,16 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Hero from "@components/landing/Hero.astro";
+import LatestResearch from "@components/landing/LatestResearch.astro";
 import OperatingStandards from "@components/landing/OperatingStandards.astro";
+import Services from "@components/landing/Services.astro";
 import WorkPreview from "@components/landing/WorkPreview.astro";
 ---
 
-<BaseLayout>
+<BaseLayout bodyClass="blog-dark-page site-dark">
 	<Hero />
-	<WorkPreview class="!pt-20 lg:!pb-0 lg:!pt-36" />
+	<Services />
+	<LatestResearch />
+	<WorkPreview />
 	<OperatingStandards />
 </BaseLayout>

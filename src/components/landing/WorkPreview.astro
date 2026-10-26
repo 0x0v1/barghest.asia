@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
-import WokCard from "@components/work/WokCard.astro";
+import { Image } from "astro:assets";
+import { getLangFromUrl, useTranslations, useTranslatedPath } from "@i18n/utils";
 
 // Localized project write-ups are not maintained separately; use the current
 // English WARD/MESH collection while the surrounding interface is localized.
@@ -8,12 +9,18 @@ const contentLang = "en";
 
 const { class: className } = Astro.props;
 
-const projectDetails: Record<string, { summary: string }> = {
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+const projectDetails: Record<string, { summary: string; kind: string }> = {
 	ward: {
+		kind: "Device triage",
 		summary:
 			"Open-source Android evidence collection and structured device triage. WARD helps people preserve useful artefacts and identify activity that needs deeper review.",
 	},
 	mesh: {
+		kind: "Remote collection",
 		summary:
 			"Consent-based remote evidence collection for cases where an investigator cannot reach the device. MESH is designed to be self-hosted by the communities using it.",
 	},
@@ -22,18 +29,8 @@ const projectDetails: Record<string, { summary: string }> = {
 const projectOrder = ["ward", "mesh"];
 
 const allProjects = (await getCollection("projects"))
-	.filter((prj) => {
-		const [postLang, ...slug] = prj.slug.split("/");
-		return postLang === contentLang;
-	})
-	.map((prj) => {
-		const [postLang, slug] = prj.slug.split("/");
-
-		return {
-			...prj,
-			slug: slug,
-		};
-	})
+	.filter((prj) => prj.slug.split("/")[0] === contentLang)
+	.map((prj) => ({ ...prj, slug: prj.slug.split("/")[1] }))
 	.sort((a, b) => {
 		const aIndex = projectOrder.indexOf(a.slug);
 		const bIndex = projectOrder.indexOf(b.slug);
@@ -41,22 +38,36 @@ const allProjects = (await getCollection("projects"))
 	});
 ---
 
-<section id="projects" class:list={["section work-preview-section bg-slate-50 py-24 text-zinc-950 lg:py-40", className]}>
-	<div class="col-span-12 col-start-1 mx-auto w-full max-w-7xl">
-		<ol class="flex flex-col gap-32 lg:gap-0">
+<section id="projects" class:list={["section !py-24 lg:!py-36", className]}>
+	<div class="col-span-12 mx-auto w-full max-w-7xl">
+		<h2 class="section-title">Our tools</h2>
+		<ol class="mt-16 grid gap-12 md:grid-cols-2 lg:mt-20 lg:gap-10">
 			{
-				allProjects.map((project, index) => {
+				allProjects.map((project) => {
 					const details = projectDetails[project.slug];
 					return (
-						<WokCard
-							image={project.data.image?.source}
-							imageAlt={project.data.image?.alt}
-							project={project.data.title}
-							link={`/work/${project.slug}`}
-							description={details?.summary ?? project.data.description}
-							reverse={index % 2 === 1}
-							invertArtwork={project.slug === "mesh"}
-						/>
+						<li>
+							<a href={translatePath(`/work/${project.slug}`)} class="project-card group flex h-full flex-col">
+								<div class="flex aspect-[16/10] items-center justify-center overflow-hidden rounded-lg bg-slate-200 p-12">
+									{project.data.image && (
+										<Image
+											src={project.data.image.source}
+											alt={project.data.image.alt}
+											widths={[480, 768, 1200]}
+											sizes="(min-width: 768px) 50vw, 100vw"
+											class:list={["h-full w-auto object-contain mix-blend-multiply", project.slug === "mesh" && "invert"]}
+										/>
+									)}
+								</div>
+								<div class="flex flex-1 flex-col pt-8">
+									<h3 class="text-2xl font-semibold text-white lg:text-3xl">
+										{project.data.title} <span class="text-slate-500">· {details?.kind ?? "Project"}</span>
+									</h3>
+									<p class="mt-4 max-w-lg flex-1 text-lg leading-8 text-slate-400">{details?.summary ?? project.data.description}</p>
+									<span class="text-link mt-6 inline-block self-start">{t("projects.see")}</span>
+								</div>
+							</a>
+						</li>
 					);
 				})
 			}

@@ -1,47 +1,38 @@
 ---
-import Title from "@components/global/Title.astro";
+
+const about = [
+	"BARGHEST <code class=\"rounded bg-zinc-900 px-1.5 py-0.5 font-mono text-base text-white\">{BAR-gest}</code> is a non-profit company limited by guarantee (CLG) registered in the United Kingdom. We work in and for civil society, with most of our programmes based in East and South Asia. For U.S.-based funders, we have a valid Equivalency Determination by Latitude Global, and thus are treated as the equivalent of a 501(c)(3) organization for grantmaking purposes.",
+	"BARGHEST is a security research team of hackers. We investigate mobile surveillance, targeted malware, and vulnerabilities that put human rights defenders and journalists at risk, particularly in East and South East Asia.",
+	"Offensive security research informs what we build. We conduct penetration testing, vulnerability analysis, and reverse engineering. This gives our research and development work a full cycle: we study how spyware and other threats work, then use those findings to build a forensic commons for spyware investigations.",
+	"Our findings also shape our open-source forensic tools. WARD helps people collect and review evidence from Android devices. MESH is being built for consent-based remote evidence collection when an investigator cannot reach the device in person.",
+	"Our tools are built entirely in house by our own team, which includes some of the best software engineers in the industry. We never outsource development or subgrant it to another organization.",
+	"Sensitive evidence should not have to pass through a commercial vendor or a distant specialist before a community can act on it. Our tools are designed around consent, local control, careful handling of evidence, and redaction. Expert review still matters, but it should not be the only way to begin an investigation.",
+];
 ---
 
-<section>
-	<div class="mx-auto max-w-7xl px-8 py-12 md:px-12 lg:px-32 lg:py-32">
+<section class="blog-index">
+	<div class="mx-auto flex flex-col gap-16 px-8 py-24 md:px-12 lg:pt-32 2xl:max-w-7xl">
+		<div class="max-w-5xl space-y-8 pt-20">
+			{about.map((text) => <p class="text-lg leading-8 text-slate-400" set:html={text} />)}
+		</div>
+
+	<div class="grid w-full gap-x-16 gap-y-14 pt-8 md:grid-cols-2">
 		<div>
-			<Title title="" subtitle="{ BARG-HEST }" class="pb-10 pt-20 uppercase" />
+			<h2 class="text-2xl font-semibold text-white lg:text-3xl">Connect</h2>
+			<p class="mt-4 max-w-lg text-lg leading-8 text-slate-400">
+				We welcome collaboration with security researchers, developers, human rights groups, helplines, and forensic labs.
+			</p>
+			<p class="mt-4 max-w-lg text-lg leading-8 text-slate-400">
+				Write to <a href="mailto:info@barghest.asia" class="text-slate-200 underline underline-offset-4 hover:text-white">info@barghest.asia</a>.
+			</p>
 		</div>
-		<div class="prose-styles mt-12 lg:mt-24">
-			<h2>ABOUT</h2>
-			<p>
-				We are a non-profit company limited by guarantee (CLG) registered in the United Kingdom. We work in and for civil society, with most
-				of our programmes based in East and South Asia. For U.S.-based funders, we have a valid Equivalency Determination by Latitude Global,
-				and thus are treated as the equivalent of a 501(c)(3) organization for grantmaking purposes.
+		<div>
+			<h2 class="text-2xl font-semibold text-white lg:text-3xl">Donate</h2>
+			<p class="mt-4 max-w-lg text-lg leading-8 text-slate-400">
+				If our work has helped you or improved the security of your product, you can support our research with Bitcoin.
 			</p>
-			<p>
-				BARGHEST is a security research team of hackers. We investigate mobile surveillance, targeted malware, and vulnerabilities that put
-				human rights defenders and journalists at risk, particularly in East and South East Asia.
-			</p>
-			<p>
-				Offensive security research informs what we build. We conduct penetration testing, vulnerability analysis, and reverse engineering.
-				This gives our research and development work a full cycle: we study how spyware and other threats work, then use those findings to
-				build a forensic commons for spyware investigations.
-			</p>
-			<p>
-				Our findings also shape our open-source forensic tools. WARD helps people collect and review evidence from Android devices. MESH is
-				being built for consent-based remote evidence collection when an investigator cannot reach the device in person.
-			</p>
-			<p>
-				Our tools are built entirely in house by our own team, which includes some of the best software engineers in the industry. We never
-				outsource development or subgrant it to another organization.
-			</p>
-			<p>
-				Sensitive evidence should not have to pass through a commercial vendor or a distant specialist before a community can act on it. Our
-				tools are designed around consent, local control, careful handling of evidence, and redaction. Expert review still matters, but it
-				should not be the only way to begin an investigation.
-			</p>
-			<h2 class="mt-12">CONNECT</h2>
-			<p>We welcome collaboration with security researchers, developers, human rights groups, helplines, and forensic labs.</p>
-			<p>Write to <a href="mailto:info@barghest.asia" class="font-semibold text-black hover:underline">info@barghest.asia</a>.</p>
-			<h2 class="mt-12">DONATE</h2>
-			<p>If our work has helped you or improved the security of your product, you can support our research with Bitcoin.</p>
-			<p class="break-all">BTC: <code>bc1qsfrk6nqg0fm7ewxe3cwyztw53lpfw6dm7daxzk</code></p>
+			<p class="mt-4 break-all text-lg leading-8 text-slate-400">BTC: <code class="font-mono text-base text-slate-200">bc1qsfrk6nqg0fm7ewxe3cwyztw53lpfw6dm7daxzk</code></p>
 		</div>
+	</div>
 	</div>
 </section>

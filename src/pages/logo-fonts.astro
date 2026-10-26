@@ -1,0 +1,69 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Wordmark from "@components/global/Wordmark.astro";
+import { Image } from "astro:assets";
+import croppedLogo from "@assets/images/global/logo-cropped.png";
+
+const options = [
+	{ name: "A. Inter Tight, tracked", note: "Clean and neutral, close to what SRLabs and most research labs use. Now in the header.", props: {} },
+	{
+		name: "B. IBM Plex Mono",
+		note: "Monospace, so it matches the mono titles on your research cards.",
+		props: { font: "'IBM Plex Mono'", weight: 600, tracking: "0.08em", size: 1.25 },
+	},
+	{
+		name: "C. IBM Plex Sans Condensed",
+		note: "Tall and narrow. Serious and institutional.",
+		props: { font: "'IBM Plex Sans Condensed'", weight: 700, tracking: "0.1em", size: 1.4 },
+	},
+	{
+		name: "D. Manrope",
+		note: "Geometric and modern, softer corners.",
+		props: { font: "'Manrope'", weight: 800, tracking: "0.12em", size: 1.3 },
+	},
+	{
+		name: "E. Inter Tight, light",
+		note: "Same as A but thin and airy. Quiet and premium.",
+		props: { weight: 300, tracking: "0.22em", size: 1.3 },
+	},
+];
+---
+
+<BaseLayout seo={{ title: "Logo font options", noindex: true }} bodyClass="blog-dark-page site-dark">
+	<section class="section !pb-24 !pt-40">
+		<div class="col-span-12 mx-auto w-full max-w-7xl">
+			<h1 class="section-title">Logo fonts</h1>
+			<p class="mt-8 max-w-2xl text-lg leading-8 text-slate-400">Round 2: lighter, cleaner options, at header size and at 2x.</p>
+
+			<div class="grid items-center gap-8 border-b border-slate-800 py-12 lg:grid-cols-12">
+				<div class="lg:col-span-4">
+					<p class="text-xl font-semibold text-white">F. Your original wordmark</p>
+					<p class="mt-2 text-base leading-7 text-slate-400">Same lettering as before, cropped and shown at a readable size.</p>
+				</div>
+				<div class="lg:col-span-3">
+					<Image src={croppedLogo} alt="Original BARGHEST logo" class="logo-svg h-12 w-auto" />
+				</div>
+				<div class="lg:col-span-5">
+					<Image src={croppedLogo} alt="Original BARGHEST logo" class="logo-svg h-24 w-auto" />
+				</div>
+			</div>
+
+			{
+				options.map(({ name, note, props }) => (
+					<div class="grid items-center gap-8 border-b border-slate-800 py-12 lg:grid-cols-12">
+						<div class="lg:col-span-4">
+							<p class="text-xl font-semibold text-white">{name}</p>
+							<p class="mt-2 text-base leading-7 text-slate-400">{note}</p>
+						</div>
+						<div class="lg:col-span-3">
+							<Wordmark {...props} />
+						</div>
+						<div class="origin-left scale-[2] lg:col-span-5">
+							<Wordmark {...props} />
+						</div>
+					</div>
+				))
+			}
+		</div>
+	</section>
+</BaseLayout>

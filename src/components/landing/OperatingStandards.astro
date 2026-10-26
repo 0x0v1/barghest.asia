@@ -6,61 +6,23 @@ const { class: className } = Astro.props;
 const lang = getLangFromUrl(Astro.url);
 const translatePath = useTranslatedPath(lang);
 
-const workAreas = [
-	{
-		title: "Democratizing threat research",
-		content:
-			"Civil society needs to be able to investigate digital threats for itself. Yet forensic and threat research capabilities remain concentrated in private companies, governments, and specialist labs. We publish tools and methods that people can inspect, run locally, and adapt without sending sensitive evidence to a central provider.",
-	},
-	{
-		title: "Offensive security research",
-		content:
-			"We hack software to understand how it fails. Our work includes penetration testing, vulnerability analysis, reverse engineering, and exploitation research, with responsible disclosure when we find security flaws.",
-	},
-	{
-		title: "Research-led development",
-		content:
-			"Our security research feeds directly into our software. Our in-house engineers turn what we learn about attacks and spyware into open-source forensic tools. Development is never outsourced or subgranted.",
-	},
+const paragraphs = [
+	"We research devices, both benign and compromised, and the software that runs on them. We reverse-engineer applications, find vulnerabilities, and examine seized phones to establish what happened during a compromise. We work from the evidence available, reproduce what we can, and distinguish what the evidence shows from what we can only infer. We report vulnerabilities to those responsible for fixing them and document methods of surveillance so others can recognise them.",
+	"The people most likely to be targeted by spyware rarely have the resources to investigate it themselves. Journalists, human rights defenders, lawyers and civil society organisations face adversaries with specialist tools and technical expertise, while the means to investigate these threats remain concentrated in a handful of companies and specialist laboratories. Civil society should not have to rely on them to understand what has happened to its own devices.",
+	"We build open-source forensic tools that allow investigators to examine devices remotely and investigate suspicious activity. We develop them in-house and in the open, without outsourcing or subgranting the engineering work. The software runs locally wherever possible, and the evidence remains under the control of those conducting the investigation.",
+	"We also conduct forensic investigations ourselves. Tools can collect data, but interpreting it requires an understanding of how devices work, where evidence comes from, and what it can establish. We publish our findings so others can build on what we learn.",
+	"Our aim is to put the means of investigating digital surveillance into the hands of the people facing it.",
 ];
 ---
 
-<section id="operating-standards" class:list={["section home-dark-section bg-zinc-900 py-24 text-white lg:py-32", className]}>
+<section id="operating-standards" class:list={["section !py-24 lg:!py-36", className]}>
 	<div class="col-span-12 mx-auto w-full max-w-7xl">
-		<div class="max-w-5xl">
-			<h2 class="max-w-4xl text-3xl font-semibold leading-tight tracking-normal text-white sm:text-4xl lg:text-5xl">
-				We uncover software vulnerabilities, study how they’re exploited, and use that research to build open-source forensic tools for civil society.
-			</h2>
-			<p class="mt-8 max-w-3xl text-base leading-8 text-zinc-300 md:text-lg">
-				BARGHEST is a security research and development team. Our offensive security research informs the open-source forensic tools we build
-				in-house. We put these tools in communities’ hands so they can investigate spyware without relying on large technology companies, closed
-				services, or distant specialist labs.
-			</p>
-			<div class="mt-10 flex flex-wrap gap-3">
-				<a
-					href={translatePath("/blog/")}
-					class="inline-flex h-10 items-center justify-center rounded bg-white px-4 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-200">
-					Read research
-				</a>
-				<a
-					href={translatePath("/escalation/")}
-					class="inline-flex h-10 items-center justify-center rounded border border-zinc-600 px-4 text-sm font-semibold text-white transition hover:border-zinc-300 hover:bg-zinc-800">
-					Escalate a case
-				</a>
-			</div>
+		<h2 class="section-title">How we work</h2>
+		<div class="mt-16 max-w-5xl space-y-8 lg:mt-20">
+			{paragraphs.map((text) => <p class="text-lg leading-8 text-slate-400">{text}</p>)}
 		</div>
-
-		<ol class="mt-20 grid gap-10 lg:grid-cols-3 lg:gap-12">
-			{
-				workAreas.map(({ title, content }) => (
-					<li>
-						<div class="max-w-md">
-							<h3 class="text-2xl font-semibold leading-tight tracking-normal text-white">{title}</h3>
-							<p class="mt-5 text-base leading-8 text-zinc-400">{content}</p>
-						</div>
-					</li>
-				))
-			}
-		</ol>
+		<div class="mt-12">
+			<a href={translatePath("/about/")} class="btn btn-solid">About us</a>
+		</div>
 	</div>
 </section>

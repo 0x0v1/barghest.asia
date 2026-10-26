@@ -1,14 +1,14 @@
 ---
 import type { AstroSeoProps } from "@astrolib/seo";
-import Articles from "@components/blog/Articles.astro";
+import NewsFeed from "@components/news/NewsFeed.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 
 const seo: AstroSeoProps = {
-	title: "Исследования безопасности | BARGHEST",
-	description: "Технические исследования BARGHEST о мобильной безопасности, шпионском ПО, уязвимостях, эксплуатации и цифровой криминалистике.",
+	title: "Блог | BARGHEST",
+	description: "Блог и обновления BARGHEST.",
 };
 ---
 
 <BaseLayout seo={seo} bodyClass="blog-dark-page">
-	<Articles />
+	<NewsFeed />
 </BaseLayout>
