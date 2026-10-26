@@ -9,10 +9,12 @@ const translatePath = useTranslatedPath(lang);
 ---
 
 <footer class="section !py-12 lg:!py-16">
-	<div class="footer-plain col-span-12 mx-auto w-full max-w-7xl space-y-2 font-mono text-sm leading-7 text-slate-500">
-		<a href={translatePath("/")} aria-label="Home" class="footer-wolf mb-6 inline-block">
-			<Image src={wolfHead} alt="BARGHEST" widths={[96, 192]} sizes="64px" class="w-16 opacity-90 transition-opacity hover:opacity-100" />
+	<div class="footer-plain col-span-12 grid w-full gap-10 font-mono text-sm leading-7 text-slate-500 lg:grid-cols-12 lg:gap-16">
+		<!-- Wolf head on the left, as in the original footer -->
+		<a href={translatePath("/")} aria-label="Home" class="footer-wolf block lg:col-span-3">
+			<Image src={wolfHead} alt="BARGHEST" widths={[160, 320]} sizes="160px" class="w-32 opacity-90 transition-opacity hover:opacity-100 lg:w-40" />
 		</a>
+		<div class="space-y-2 lg:col-span-9 lg:col-start-4">
 		<p>
 			<a href={translatePath("/")}>Home</a> ·
 			<a href={translatePath("/about/")}>About</a> ·
@@ -31,6 +33,7 @@ const translatePath = useTranslatedPath(lang);
 			<a href="https://github.com/BARGHEST-ngo" target="_blank">GitHub</a>
 		</p>
 		<p>CC0 No Rights Reserved</p>
+		</div>
 	</div>
 </footer>
 
