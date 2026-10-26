@@ -1,0 +1,28 @@
+---
+import { Image } from "astro:assets";
+import openSocietyFoundations from "@assets/images/supporters/open-society-foundations.svg";
+import openTechnologyFund from "@assets/images/supporters/open-technology-fund.png";
+
+// Logos are stored pre-converted to white so they read on the dark background.
+const supporters = [
+	{ name: "Open Society Foundations", logo: openSocietyFoundations, url: "https://www.opensocietyfoundations.org/" },
+	{ name: "Open Technology Fund", logo: openTechnologyFund, url: "https://www.opentech.fund/" },
+];
+---
+
+<section id="supporters" class="section !py-12 lg:!py-16">
+	<div class="col-span-12 mx-auto w-full max-w-7xl">
+		<p class="font-mono text-xs font-semibold uppercase text-slate-400">Supported by</p>
+		<ul class="mt-8 flex flex-wrap items-center gap-x-16 gap-y-10">
+			{
+				supporters.map(({ name, logo, url }) => (
+					<li>
+						<a href={url} target="_blank" rel="noopener" title={name} class="block opacity-80 transition-opacity hover:opacity-100">
+							<Image src={logo} alt={name} class="h-10 w-auto lg:h-12" />
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</section>

@@ -1,5 +1,7 @@
 ---
+import { Image } from "astro:assets";
 import { getLangFromUrl, useTranslatedPath, useTranslations } from "@i18n/utils";
+import wolfHead from "@assets/images/projects/BARGHEST.png";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -8,6 +10,9 @@ const translatePath = useTranslatedPath(lang);
 
 <footer class="section !py-12 lg:!py-16">
 	<div class="footer-plain col-span-12 mx-auto w-full max-w-7xl space-y-2 font-mono text-sm leading-7 text-slate-500">
+		<a href={translatePath("/")} aria-label="Home" class="footer-wolf mb-6 inline-block">
+			<Image src={wolfHead} alt="BARGHEST" widths={[96, 192]} sizes="64px" class="w-16 opacity-90 transition-opacity hover:opacity-100" />
+		</a>
 		<p>
 			<a href={translatePath("/")}>Home</a> ·
 			<a href={translatePath("/about/")}>About</a> ·
@@ -37,5 +42,13 @@ const translatePath = useTranslatedPath(lang);
 	}
 	.footer-plain a:hover {
 		color: #fff;
+	}
+	.footer-plain .footer-wolf {
+		text-decoration: none;
+	}
+	/* The wolf head is black; flip it to white on dark pages */
+	:global(body.site-dark) .footer-wolf img,
+	:global(body.blog-dark-page) .footer-wolf img {
+		filter: invert(1);
 	}
 </style>
