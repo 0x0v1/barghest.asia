@@ -1,0 +1,15 @@
+---
+import ListThread from "@components/news/ListThread.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getAllThreads } from "@lib/sourcehut";
+
+export async function getStaticPaths() {
+	return (await getAllThreads()).map((thread) => ({ params: { id: thread.id }, props: { thread } }));
+}
+
+const { thread } = Astro.props;
+---
+
+<BaseLayout seo={{ title: `${thread.subject} | BARGHEST`, description: `${thread.subject}: BARGHEST mailing list` }} bodyClass="blog-dark-page">
+	<ListThread thread={thread} />
+</BaseLayout>

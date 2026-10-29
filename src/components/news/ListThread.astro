@@ -1,0 +1,81 @@
+---
+import type { ListThread } from "@lib/sourcehut";
+import { getLangFromUrl, useTranslatedPath, useTranslations } from "@i18n/utils";
+
+interface Props {
+	thread: ListThread;
+}
+
+const { thread } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+const formatDate = (date: Date) => date.toISOString().slice(0, 16).replace("T", " ") + " UTC";
+
+// Plain text in, wrapped text out: quoted lines are dimmed and URLs become links.
+// Built as a string because whitespace in the template would show up in pre-wrap text.
+const escape = (text: string) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const urlPattern = /(https?:\/\/[^\s<>()]+[^\s<>().,;:!?'"])/g;
+const toHtml = (body: string) =>
+	body
+		.split("\n")
+		.map((line) => {
+			const html = line
+				.split(urlPattern)
+				.map((text, i) =>
+					i % 2 === 1 ? `<a href="${escape(text)}" rel="nofollow noopener">${escape(text)}</a>` : escape(text),
+				)
+				.join("");
+			const quoted = /^\s*>/.test(line) || /^On .+ wrote:$/.test(line.trim());
+			return quoted ? `<span class="quoted">${html}</span>` : html;
+		})
+		.join("\n");
+---
+
+<section class="blog-index">
+	<div class="mx-auto flex flex-col gap-16 px-8 py-24 md:px-12 lg:pt-32 2xl:max-w-7xl">
+		<div class="blog-kicker pt-20">
+			<p class="font-mono text-xs font-semibold uppercase text-slate-400">
+				<a href={translatePath("/news/")} class="hover:text-white">{t("news.kicker")}</a>
+			</p>
+		</div>
+
+		<article class="max-w-3xl font-mono text-base leading-7 text-slate-300">
+			<h1 class="text-xl font-semibold leading-snug text-slate-100 md:text-2xl">{thread.subject}</h1>
+			{
+				thread.messages.map((message, i) => (
+					<div class:list={["mt-10", i > 0 && "border-l border-slate-800 pl-6"]}>
+						<p class="text-sm text-slate-500">
+							<time datetime={message.date.toISOString()}>{formatDate(message.date)}</time>
+							{message.from && ` · ${message.from}`}
+						</p>
+						<div class="list-message mt-4 text-slate-300" set:html={toHtml(message.body)} />
+					</div>
+				))
+			}
+
+			<p class="mt-12 text-sm">
+				<a href={thread.archiveUrl} class="text-link">{t("news.original")}</a>
+			</p>
+		</article>
+	</div>
+</section>
+
+<style>
+	/* Keep the plain-text line breaks, but wrap long lines instead of scrolling */
+	.list-message {
+		white-space: pre-wrap;
+		overflow-wrap: anywhere;
+	}
+	.list-message :global(.quoted) {
+		color: #64748b;
+	}
+	.list-message :global(a) {
+		color: #f1f5f9;
+		text-decoration: underline;
+		text-underline-offset: 0.3em;
+	}
+	.list-message :global(a:hover) {
+		color: #fff;
+	}
+</style>

@@ -1,9 +1,10 @@
 ---
-import { getLangFromUrl, useTranslations } from "@i18n/utils";
+import { getLangFromUrl, useTranslatedPath, useTranslations } from "@i18n/utils";
 import { getListThreads, LIST_ARCHIVE, LIST_NAME, LIST_OWNER } from "@lib/sourcehut";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
 
 // sourcehut list: ~ox0v1/BARGHEST@lists.sr.ht (plain-text email only)
 const list = `~${LIST_OWNER}/${LIST_NAME}`;
@@ -42,14 +43,10 @@ const sections = [
 			<h2 class="uppercase text-slate-100">{t("news.recent")}</h2>
 			{
 				threads.length ? (
-					<>
-					<p class="mt-2 pl-8 text-slate-400">
-						{t("news.recent.note")} <span class="break-all text-slate-100">{LIST_ARCHIVE.replace("https://", "")}</span>
-					</p>
 					<ul class="mt-4 pl-8">
 						{threads.map((thread) => (
 							<li class="py-2">
-								<a href={thread.url} class="group flex flex-col gap-x-6 sm:flex-row">
+								<a href={translatePath(thread.path)} class="group flex flex-col gap-x-6 sm:flex-row">
 									<time class="shrink-0 text-slate-500" datetime={thread.date.toISOString()}>
 										{formatDate(thread.date)}
 									</time>
@@ -65,7 +62,6 @@ const sections = [
 							</li>
 						))}
 					</ul>
-					</>
 				) : (
 					<p class="mt-2 pl-8 text-slate-400">
 						{t("news.recent.empty")}{" "}
