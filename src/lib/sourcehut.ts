@@ -29,7 +29,7 @@ export interface ListThread {
 	date: Date;
 	from: string;
 	replies: number;
-	// Page on this site, e.g. /news/518789/
+	// Page on this site, e.g. /mail/518789/
 	path: string;
 	// Original message in the sourcehut archive
 	archiveUrl: string;
@@ -125,7 +125,7 @@ async function fetchThreads(): Promise<ListThread[]> {
 				date: new Date(thread.created),
 				from: displayName(thread.root.from?.[0]),
 				replies: thread.replies,
-				path: `/news/${thread.root.id}/`,
+				path: `/mail/${thread.root.id}/`,
 				// Same format sourcehut uses in its own archive links
 				archiveUrl: `${LIST_ARCHIVE}/%3C${encodeURIComponent(messageID).replace(/%3D/g, "=").replace(/%40/g, "@")}%3E`,
 				messages: [toMessage(thread.root), ...replies],
