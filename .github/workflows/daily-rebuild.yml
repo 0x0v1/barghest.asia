@@ -1,6 +1,6 @@
 name: Daily rebuild
 
-# Rebuilds the site once a day so /news/ picks up new mailing-list threads
+# Rebuilds the site once a day so /mail/ picks up new mailing-list threads
 # (they are fetched from lists.sr.ht at build time).
 # Requires the repository secret CF_PAGES_DEPLOY_HOOK: the Cloudflare Pages
 # deploy hook URL (Pages project > Settings > Builds & deployments > Deploy hooks).

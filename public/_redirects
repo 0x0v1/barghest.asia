@@ -17,3 +17,11 @@
 /cn/blog/the-rise-of-sustainable-technology /cn/research/the-rise-of-sustainable-technology/ 301
 /ru/blog/pbap-device-seizure-sorm/ /ru/research/pbap-device-seizure-sorm/ 301
 /ru/blog/pbap-device-seizure-sorm /ru/research/pbap-device-seizure-sorm/ 301
+
+# The mailing list page moved from /news/ to /mail/.
+/news /mail/ 301
+/news/* /mail/:splat 301
+/cn/news /cn/mail/ 301
+/cn/news/* /cn/mail/:splat 301
+/ru/news /ru/mail/ 301
+/ru/news/* /ru/mail/:splat 301
