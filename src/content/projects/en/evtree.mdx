@@ -1,0 +1,17 @@
+---
+pubDate: 2026-11-04
+author:
+    name: Ovi
+    link: /author/ovi
+title: Evtree
+description: "A Go library for forensic evidence integrity — Merkle tree acquisition, chain of custody, and tamper-evident sealing"
+link: https://github.com/BARGHEST-ngo/Evtree
+---
+
+Evtree (Evidence Tree) is a Go library for forensic evidence integrity. It computes a deterministic, directory-aware Merkle tree hash over a set of files, so a single root hash seals an entire evidence set. If any file is changed, added, removed, or moved, the hash differs and the alteration is revealed. Because the tree mirrors the directory structure, it can also isolate exactly which files changed between two acquisitions without rehashing everything.
+
+During acquisition it records case metadata — case number, exhibit reference, examiner identity, device identifiers — alongside the file tree. Files that cannot be read are logged as evidence errors with a reason and timestamp rather than aborting the acquisition, so partial captures from locked or protected files on seized devices are documented rather than lost.
+
+The root hash can be bound to a point in time with RFC 3161 trusted timestamping from an independent authority, anchoring the acquisition to an externally verifiable clock instead of a manipulable system one. Evidence directories can be sealed into tamper-evident, age-encrypted archives with the acquisition manifest written inside and as a detached file.
+
+Evtree is the integrity layer underneath [MESH](https://github.com/BARGHEST-ngo/MESH), where it provides tamper-evident verification of acquired forensic artifacts.

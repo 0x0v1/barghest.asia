@@ -1,0 +1,17 @@
+---
+pubDate: 2026-11-04
+author:
+    name: Ovi
+    link: /author/ovi
+title: MESHnet
+description: "An open protocol for peer-to-peer, end-to-end encrypted connections between devices"
+link: https://github.com/BARGHEST-ngo/MESHnet
+---
+
+MESHnet is a small Go library that connects a server to its clients over an encrypted, peer-to-peer tunnel. A server shares an address, a client joins with a one-time PIN shared out-of-band, and from then on the two can exchange messages, open streams, and optionally route the client's traffic out through the server.
+
+There are no accounts, no pre-shared key lists, and no coordination server to run. Access is gated behind a PIN alone, and nothing is persisted: the server gets a new key and address on every start, and a lost connection ends the session. A client has to reconnect from scratch with a new PIN.
+
+It is built as the networking layer underneath our other tools. Remote, consent-based forensics is the motivating use case, where an analyst needs to reach a device that is in someone else's hands, possibly in another country, without either side opening inbound ports. The same primitives also support private one-to-one messaging, direct file transfer, remote support, and using a trusted machine as an exit for a device's traffic.
+
+MESHnet is early in development and subject to change. It should currently be treated as pre-alpha.

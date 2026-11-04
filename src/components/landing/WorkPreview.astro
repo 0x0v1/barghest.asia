@@ -22,11 +22,26 @@ const projectDetails: Record<string, { summary: string; kind: string }> = {
 	mesh: {
 		kind: "Remote collection",
 		summary:
-			"Consent-based remote evidence collection for cases where an investigator cannot reach the device. MESH is designed to be self-hosted by the communities using it.",
+			"Consent-based remote evidence collection for cases where an investigator cannot reach the device. MESHforensics is designed to be self-hosted by the communities using it.",
+	},
+	meshnet: {
+		kind: "Encrypted tunnels",
+		summary:
+			"An open protocol for peer-to-peer, end-to-end encrypted connections between devices. Clients pair with a one-time PIN, nothing is persisted, and neither side opens inbound ports.",
+	},
+	meshdrop: {
+		kind: "File transfer",
+		summary:
+			"Private drag-and-drop file sharing straight from one desktop to another. No cloud, no account, no trace. Built on MESHnet.",
+	},
+	evtree: {
+		kind: "Evidence integrity",
+		summary:
+			"A Go library for forensic evidence integrity. Merkle tree acquisition, chain-of-custody audit trails, RFC 3161 timestamping, and tamper-evident sealing. The integrity layer underneath MESH.",
 	},
 };
 
-const projectOrder = ["ward", "mesh"];
+const projectOrder = ["ward", "mesh", "meshnet", "meshdrop", "evtree"];
 
 const allProjects = (await getCollection("projects"))
 	.filter((prj) => prj.slug.split("/")[0] === contentLang)
@@ -36,6 +51,9 @@ const allProjects = (await getCollection("projects"))
 		const bIndex = projectOrder.indexOf(b.slug);
 		return (aIndex === -1 ? projectOrder.length : aIndex) - (bIndex === -1 ? projectOrder.length : bIndex);
 	});
+
+const cardProjects = allProjects.filter((prj) => prj.data.image);
+const textProjects = allProjects.filter((prj) => !prj.data.image);
 ---
 
 <section id="projects" class:list={["section !py-24 lg:!py-36", className]}>
@@ -43,21 +61,19 @@ const allProjects = (await getCollection("projects"))
 		<h2 class="section-title">Our tools</h2>
 		<ol class="mt-16 grid gap-12 md:grid-cols-2 lg:mt-20 lg:gap-10">
 			{
-				allProjects.map((project) => {
+				cardProjects.map((project) => {
 					const details = projectDetails[project.slug];
 					return (
 						<li>
 							<a href={translatePath(`/work/${project.slug}`)} class="project-card group flex h-full flex-col">
 								<div class="flex aspect-[16/10] items-center justify-center overflow-hidden rounded-lg bg-slate-200 p-12">
-									{project.data.image && (
-										<Image
-											src={project.data.image.source}
-											alt={project.data.image.alt}
-											widths={[480, 768, 1200]}
-											sizes="(min-width: 768px) 50vw, 100vw"
-											class:list={["h-full w-auto object-contain mix-blend-multiply", project.slug === "mesh" && "invert"]}
-										/>
-									)}
+									<Image
+										src={project.data.image.source}
+										alt={project.data.image.alt}
+										widths={[480, 768, 1200]}
+										sizes="(min-width: 768px) 50vw, 100vw"
+										class:list={["h-full w-auto object-contain mix-blend-multiply", project.slug === "mesh" && "invert"]}
+									/>
 								</div>
 								<div class="flex flex-1 flex-col pt-8">
 									<h3 class="text-2xl font-semibold text-white lg:text-3xl">
@@ -72,5 +88,26 @@ const allProjects = (await getCollection("projects"))
 				})
 			}
 		</ol>
+
+		{
+			textProjects.length > 0 && (
+				<ul class="mt-12 grid gap-10 md:grid-cols-2 lg:mt-16 lg:gap-12">
+					{textProjects.map((project) => {
+						const details = projectDetails[project.slug];
+						return (
+							<li>
+								<h3 class="text-2xl font-semibold text-white lg:text-3xl">
+									{project.data.title} <span class="text-slate-500">· {details?.kind ?? "Project"}</span>
+								</h3>
+								<p class="mt-4 max-w-2xl text-lg leading-8 text-slate-400">{details?.summary ?? project.data.description}</p>
+								<a href={translatePath(`/work/${project.slug}`)} class="text-link mt-4 inline-block">
+									{t("projects.see")}
+								</a>
+							</li>
+						);
+					})}
+				</ul>
+			)
+		}
 	</div>
 </section>
