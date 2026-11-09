@@ -6,6 +6,7 @@ const postsCollection = defineCollection({
 			title: z.string(),
 			seoTitle: z.string().optional(),
 			pubDate: z.date(),
+			updatedDate: z.date().optional(),
 			description: z.string(),
 			seoDescription: z.string().optional(),
 			author: z.object({

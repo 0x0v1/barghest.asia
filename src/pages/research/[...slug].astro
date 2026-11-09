@@ -65,25 +65,37 @@ const seo: AstroSeoProps = {
 
 const articleStructuredData = {
 	"@context": "https://schema.org",
-	"@type": "Article",
-	headline: seoTitle,
-	description: seoDescription,
-	image: ogImage.url,
-	datePublished: entry.data.pubDate.toISOString(),
-	dateModified: entry.data.pubDate.toISOString(),
-	mainEntityOfPage: canonical,
-	author: {
-		"@type": "Organization",
-		name: entry.data.author.name,
-	},
-	publisher: {
-		"@type": "Organization",
-		name: "BARGHEST",
-		logo: {
-			"@type": "ImageObject",
-			url: new URL("/images/meta/barghest_share.png", site).toString(),
+	"@graph": [
+		{
+			"@type": "Article",
+			headline: seoTitle,
+			description: seoDescription,
+			image: ogImage.url,
+			datePublished: entry.data.pubDate.toISOString(),
+			dateModified: (entry.data.updatedDate ?? entry.data.pubDate).toISOString(),
+			mainEntityOfPage: canonical,
+			author: {
+				"@type": "Organization",
+				name: entry.data.author.name,
+			},
+			publisher: {
+				"@type": "Organization",
+				name: "BARGHEST",
+				logo: {
+					"@type": "ImageObject",
+					url: new URL("/images/meta/barghest_share.png", site).toString(),
+				},
+			},
 		},
-	},
+		{
+			"@type": "BreadcrumbList",
+			itemListElement: [
+				{ "@type": "ListItem", position: 1, name: "Home", item: new URL("/", site).toString() },
+				{ "@type": "ListItem", position: 2, name: "Research", item: new URL("/research/", site).toString() },
+				{ "@type": "ListItem", position: 3, name: seoTitle, item: canonical },
+			],
+		},
+	],
 };
 ---
 

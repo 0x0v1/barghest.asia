@@ -39,6 +39,11 @@ function getArticleReadingTime(body: string): number {
 const readingTime = getArticleReadingTime(body);
 const isBlogPost = Array.isArray(frontmatter.tags);
 const publishedDate = frontmatter.pubDate instanceof Date ? frontmatter.pubDate.toISOString().slice(0, 10) : frontmatter.pubDate.toString().slice(0, 10);
+const updatedDate = frontmatter.updatedDate
+	? frontmatter.updatedDate instanceof Date
+		? frontmatter.updatedDate.toISOString().slice(0, 10)
+		: frontmatter.updatedDate.toString().slice(0, 10)
+	: null;
 ---
 
 <BaseLayout seo={seo} structuredData={structuredData} bodyClass={isBlogPost ? "blog-dark-page" : undefined}>
@@ -52,6 +57,12 @@ const publishedDate = frontmatter.pubDate instanceof Date ? frontmatter.pubDate.
 						</h1>
 						<div class="blog-post-meta mt-5 flex flex-wrap gap-x-3 gap-y-1 font-mono text-sm text-slate-500">
 							<time datetime={publishedDate}>{publishedDate}</time>
+							{updatedDate && updatedDate !== publishedDate && (
+								<>
+									<span aria-hidden="true">/</span>
+									<span>Updated <time datetime={updatedDate}>{updatedDate}</time></span>
+								</>
+							)}
 							<span aria-hidden="true">/</span>
 							<a href={frontmatter.author.link} rel="author">
 								{frontmatter.author.name}
