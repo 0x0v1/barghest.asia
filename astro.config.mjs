@@ -43,7 +43,7 @@ export default defineConfig({
 				return (
 					!pathname.startsWith("/cn/") &&
 					(!pathname.startsWith("/ru/") || isIndexableRussianTranslation) &&
-					!["/404/", "/thank-you/", "/mesh/privacy/", "/escalation/"].includes(pathname)
+					!["/404/", "/thank-you/", "/mesh/privacy/", "/escalation/", "/logo-fonts/"].includes(pathname)
 				);
 			},
 		}),

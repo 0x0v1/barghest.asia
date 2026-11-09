@@ -18,6 +18,15 @@
 /ru/blog/pbap-device-seizure-sorm/ /ru/research/pbap-device-seizure-sorm/ 301
 /ru/blog/pbap-device-seizure-sorm /ru/research/pbap-device-seizure-sorm/ 301
 
+# Author "Ovi" has no dedicated author page; send to the team page.
+/author/ovi /about/ 301
+/author/ovi/ /about/ 301
+
+# Common stale/guessed paths.
+/feed /rss.xml 301
+/feed/ /rss.xml 301
+/sitemap.xml /sitemap-index.xml 301
+
 # The mailing list page moved from /news/ to /mail/.
 /news /mail/ 301
 /news/* /mail/:splat 301
