@@ -1,4 +1,6 @@
 ---
+import type { AstroSeoProps } from "@astrolib/seo";
+import { getImage } from "astro:assets";
 import { getCollection } from "astro:content";
 import NewsPost from "@components/news/NewsPost.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
@@ -10,8 +12,61 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
+const site = Astro.site ?? "https://barghest.asia";
+const slug = post.slug.split("/").slice(1).join("/");
+const canonical = new URL(`/ru/blog/${slug}/`, site).toString();
+const title = `${post.data.title} | BARGHEST`;
+const description = post.data.description ?? "";
+
+// 1200x630 social-card crop from the post banner, not the multi-MB source.
+const ogRendered = post.data.image
+	? await getImage({
+			src: post.data.image.source,
+			width: 1200,
+			height: 630,
+			fit: "cover",
+			position: "center",
+			format: "jpeg",
+			quality: 82,
+		})
+	: null;
+
+const ogImage = ogRendered
+	? {
+			url: new URL(ogRendered.src, site).toString(),
+			width: 1200,
+			height: 630,
+			alt: post.data.image!.alt,
+			type: "image/jpeg",
+		}
+	: {
+			url: new URL("/images/meta/barghest_share.png", site).toString(),
+			width: 1024,
+			height: 1024,
+			alt: "BARGHEST",
+			type: "image/png",
+		};
+
+const seo: AstroSeoProps = {
+	title,
+	description,
+	canonical,
+	openGraph: {
+		url: canonical,
+		title,
+		description,
+		images: [ogImage],
+		site_name: "Barghest",
+	},
+	additionalMetaTags: [
+		{ name: "twitter:title", content: title },
+		{ name: "twitter:description", content: description },
+		{ name: "twitter:image", content: ogImage.url },
+		{ name: "twitter:image:alt", content: ogImage.alt },
+	],
+};
 ---
 
-<BaseLayout seo={{ title: `${post.data.title} | BARGHEST`, description: post.data.description }} bodyClass="blog-dark-page">
+<BaseLayout seo={seo} bodyClass="blog-dark-page">
 	<NewsPost post={post} />
 </BaseLayout>
