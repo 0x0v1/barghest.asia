@@ -1,5 +1,7 @@
 ---
+import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
+import Comments from "@components/blog/Comments.astro";
 import { getLangFromUrl } from "@i18n/utils";
 
 interface Props {
@@ -9,28 +11,64 @@ interface Props {
 const { post } = Astro.props;
 const { Content } = await post.render();
 const lang = getLangFromUrl(Astro.url);
-const dateLocale = lang === "cn" ? "zh-CN" : lang === "ru" ? "ru-RU" : "en-GB";
+
+function getArticleReadingTime(body: string): number {
+	if (!body) return 0;
+	const wordsPerMinute = 183;
+	const prose = body
+		.replace(/```[\s\S]*?```/g, " ")
+		.replace(/`[^`]*`/g, " ")
+		.replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1")
+		.replace(/<[^>]+>/g, " ")
+		.replace(/^\s*\|.*$/gm, " ")
+		.replace(/[#>*_~`|-]/g, " ");
+	const numberOfWords = prose.split(/\s+/).filter(Boolean).length;
+	return Math.ceil(numberOfWords / wordsPerMinute);
+}
+
+const readingTime = getArticleReadingTime(post.body);
+const publishedDate = post.data.pubDate.toISOString().slice(0, 10);
+const authors = post.data.authors ?? [];
 ---
 
 <section class="blog-post">
 	<article class="blog-post-shell mx-auto px-8 py-16 md:px-12 lg:py-28">
 		<header class="blog-post-header pt-16">
-			<h1 class="blog-post-title font-mono text-3xl font-semibold leading-tight text-slate-100 md:text-4xl">{post.data.title}</h1>
-			<div class="blog-post-meta mt-5 font-mono text-sm text-slate-500">
-				<time datetime={post.data.pubDate.toISOString()}>
-					{post.data.pubDate.toLocaleDateString(dateLocale, { day: "numeric", month: "long", year: "numeric" })}
-				</time>
-				{
-					post.data.authors?.map((author, i) => (
-						// Kept on one line so no stray space appears before the comma
-						<span>{i === 0 ? " · " : ", "}{author.link ? <a href={author.link} rel="author" class="underline underline-offset-4 hover:text-slate-300">{author.name}</a> : author.name}</span>
-					))
-				}
+			<h1 class="blog-post-title font-mono text-3xl font-semibold leading-tight text-slate-100 md:text-4xl">
+				{post.data.title}
+			</h1>
+			<div class="blog-post-meta mt-5 flex flex-wrap gap-x-3 gap-y-1 font-mono text-sm text-slate-500">
+				<time datetime={publishedDate}>{publishedDate}</time>
+				{authors.map((author) => (
+					<>
+						<span aria-hidden="true">/</span>
+						{author.link ? (
+							<a href={author.link} rel="author">
+								{author.name}
+							</a>
+						) : (
+							<span>{author.name}</span>
+						)}
+					</>
+				))}
+				<span aria-hidden="true">/</span>
+				<span>~{readingTime} min</span>
 			</div>
-			{post.data.description && <p class="blog-post-description mt-8 text-base leading-7 text-slate-400">{post.data.description}</p>}
+			{post.data.description && (
+				<p class="blog-post-description mt-8 text-base leading-7 text-slate-400">{post.data.description}</p>
+			)}
+			{post.data.image && (
+				<Image
+					class="blog-post-hero-image mt-10 w-full object-cover"
+					src={post.data.image.source}
+					alt={post.data.image.alt}
+				/>
+			)}
 		</header>
+
 		<div class="blog-post-prose prose-styles mt-12">
 			<Content />
 		</div>
+		<Comments />
 	</article>
 </section>

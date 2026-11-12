@@ -5,7 +5,7 @@ const { title, subtitle, class: className, subtitleClass = "uppercase" } = Astro
 <div class:list={["flex md:justify-center", className]}>
 	<div class="inline-flex flex-col gap-4">
 		<div class="inline-flex items-center gap-4">
-			<div class="hidden h-1 w-20 bg-black md:block"></div>
+			<div class="title-rule hidden h-1 w-20 bg-black md:block"></div>
 			<span class:list={["font-mono text-xs font-semibold tracking-wide", subtitleClass]} set:html={subtitle} />
 		</div>
 		<h1 class="font-display text-5xl font-extrabold sm:text-6xl md:text-7xl lg:text-9xl">{title}</h1>

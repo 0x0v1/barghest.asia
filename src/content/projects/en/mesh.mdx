@@ -5,20 +5,39 @@ author:
     link: /about/
 title: MESHforensics
 description: "Remote P2P forensics, that works"
-link: https://github.com/BARGHEST-ngo/
+link: https://github.com/BARGHEST-ngo/MESHforensics
 image:
     source: "@assets/images/projects/mesh.png"
     alt: "MESH Project Logo"
 ---
 
-Mobile spyware response in civil society has high friction. This is because often, investigators do not have proximity to a device. In nearly all cases, investigations require physical device access; ephemeral memory artifacts vanish before labs receive devices, capacity is concentrated, and can be cumbersome and jeopardize chain-of-custody.
+Mobile spyware response in civil society runs on physical access. Investigators rarely have proximity to the device, yet most investigations still require it: the phone has to reach a lab, ephemeral memory artifacts vanish before it arrives, capacity sits in a few expert hands, and the handover itself is slow and can jeopardise chain of custody.
 
-One of the most prominent reasons Android spyware research is neglected is due to the ephemeral nature of their logging system, as appose to iOS which stores logs for a much longer period of time.
+Android makes this harder than iOS. Its logging is short-lived, so the traces that matter are often gone by the time a device is in front of an analyst, while iOS retains logs for far longer. The need for physical access, set against the urgency of acting before evidence decays, leaves a clear gap: faster forensic investigation without proximity.
 
-Combined, the need for physical access and urgency, result in a high demand for solutions for quicker forensic investigation without proximity.
+MESHforensics closes that gap. It enables internet-routable wireless debugging for mobile devices over an encrypted, censorship-resistant peer-to-peer mesh. Phones are usually trapped behind NAT, firewalls, or restrictive carrier networks that block inbound access; MESHforensics builds an encrypted overlay and gives each node a CGNAT-range address on a virtual TUN interface, so devices behave as if they share a private subnet. There is no central VPN, no port forwarding, and no permanent infrastructure.
 
-MESHforensics removes these barriers by building a mesh VPN specifically for forensics, enabling consent-based, remote, memory-focused acquisition that communities can self-host and trust. 
+With that in place, an analyst can run remote mobile forensics over ADB wireless debugging and libimobiledevice as if the device were on the bench. It is built to run [WARD](/work/ward) (once released), [MVT](https://github.com/mvt-project/mvt), and [AndroidQF](https://github.com/mvt-project/androidqf) across the mesh, and it carries our peer-to-peer connectivity layer, [MESHnet](/work/meshnet). It also supports remote network monitoring, including PCAP capture and Suricata intrusion detection over the same mesh.
 
-It's peer-to-peer, end-to-end encrypted, and built for the global south.
+Meshes are ephemeral and analyst-controlled: bring the devices online, collect, then tear the network down, so nothing is left running to fingerprint.
 
-We are releasing this as open-source software in December 2025, and hope that it will be adopted by the community.
+## How it works
+
+MESHforensics is a heavily modified fork of [Tailscale](https://github.com/tailscale/tailscale) that does not depend on Tailscale's infrastructure. Peers connect directly over end-to-end encrypted WireGuard using UDP hole punching. When UDP is blocked, as it often is on censored or restrictive carrier networks, traffic fails over to end-to-end encrypted HTTPS DERP relays. These look like ordinary web traffic and survive deep packet inspection, while still carrying packets without visibility into their contents.
+
+The control plane handles only peer discovery and key exchange. Forensic traffic flows directly between endpoints wherever possible, and operators can run their own relays, so a deployment can be fully self-hosted with no BARGHEST infrastructure in the path.
+
+## Key capabilities
+
+- Peer-to-peer encrypted forensic subnets with CGNAT-assigned TUN interfaces
+- Automatic WireGuard and AmneziaWG key management, with optional transport obfuscation against deep packet inspection
+- Self-hostable control plane with ACL enforcement
+- ADB-over-WiFi and libimobiledevice support, with WARD, AndroidQF, and MVT
+- Secure forensic artifact transfer, and an optional kill-switch for containment
+- Rapid mesh creation and teardown
+
+## Status
+
+MESHforensics is in public beta and under active development. A full penetration test has been completed and the major vulnerabilities it found have been patched. Breaking changes should be expected, and some technical expertise is required to run it. Documentation is at [docs.meshforensics.org](https://docs.meshforensics.org/).
+
+It is peer-to-peer, end-to-end encrypted, and built for the global south. MESHforensics is supported by the [Open Technology Fund](https://www.opentech.fund/) to enable the consensual remote forensics of spyware and surveillance targeting human rights defenders.

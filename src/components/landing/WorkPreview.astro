@@ -76,11 +76,11 @@ const textProjects = allProjects.filter((prj) => !prj.data.image);
 									/>
 								</div>
 								<div class="flex flex-1 flex-col pt-8">
-									<h3 class="text-2xl font-semibold text-white lg:text-3xl">
-										{project.data.title} <span class="text-slate-500">· {details?.kind ?? "Project"}</span>
-									</h3>
-									<p class="mt-4 max-w-lg flex-1 text-lg leading-8 text-slate-400">{details?.summary ?? project.data.description}</p>
-									<span class="text-link mt-6 inline-block self-start">{t("projects.see")}</span>
+									<h3 class="text-2xl font-semibold text-white lg:text-3xl">{project.data.title}</h3>
+									<p class="mt-4 max-w-lg flex-1 text-lg leading-8 text-slate-400">
+										{details?.summary ?? project.data.description}{" "}
+										<span class="font-medium text-slate-200 underline underline-offset-4 transition-colors group-hover:text-white">{t("projects.see")}</span>
+									</p>
 								</div>
 							</a>
 						</li>
@@ -96,13 +96,11 @@ const textProjects = allProjects.filter((prj) => !prj.data.image);
 						const details = projectDetails[project.slug];
 						return (
 							<li>
-								<h3 class="text-2xl font-semibold text-white lg:text-3xl">
-									{project.data.title} <span class="text-slate-500">· {details?.kind ?? "Project"}</span>
-								</h3>
-								<p class="mt-4 max-w-2xl text-lg leading-8 text-slate-400">{details?.summary ?? project.data.description}</p>
-								<a href={translatePath(`/work/${project.slug}`)} class="text-link mt-4 inline-block">
-									{t("projects.see")}
-								</a>
+								<h3 class="text-2xl font-semibold text-white lg:text-3xl">{project.data.title}</h3>
+								<p class="mt-4 max-w-2xl text-lg leading-8 text-slate-400">
+									{details?.summary ?? project.data.description}{" "}
+									<a href={translatePath(`/work/${project.slug}`)} class="font-medium text-slate-200 underline underline-offset-4 transition-colors hover:text-white">{t("projects.see")}</a>
+								</p>
 							</li>
 						);
 					})}

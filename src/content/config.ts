@@ -24,19 +24,26 @@ const postsCollection = defineCollection({
 });
 
 const newsCollection = defineCollection({
-	schema: z.object({
-		title: z.string(),
-		pubDate: z.date(),
-		description: z.string().optional(),
-		authors: z
-			.array(
-				z.object({
-					name: z.string(),
-					link: z.string().optional(),
-				}),
-			)
-			.optional(),
-	}),
+	schema: ({ image }) =>
+		z.object({
+			title: z.string(),
+			pubDate: z.date(),
+			description: z.string().optional(),
+			authors: z
+				.array(
+					z.object({
+						name: z.string(),
+						link: z.string().optional(),
+					}),
+				)
+				.optional(),
+			image: z
+				.object({
+					source: image(),
+					alt: z.string(),
+				})
+				.optional(),
+		}),
 });
 
 const projectsCollection = defineCollection({

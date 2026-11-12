@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
 import { getLangFromUrl, useTranslatedPath, useTranslations } from "@i18n/utils";
 
@@ -22,11 +23,18 @@ const dateLocale = lang === "cn" ? "zh-CN" : lang === "ru" ? "ru-RU" : "en-GB";
 				<ul class="blog-list">
 					{posts.map((post) => (
 						<li>
-							<a href={translatePath(`/blog/${post.slug}/`)} class="group grid gap-2 py-8 md:grid-cols-12 md:gap-8">
+							<a href={translatePath(`/blog/${post.slug}/`)} class="group grid gap-4 py-8 md:grid-cols-12 md:gap-8">
 								<time class="font-mono text-xs uppercase text-slate-500 md:col-span-3 md:pt-1.5" datetime={post.data.pubDate.toISOString()}>
 									{post.data.pubDate.toLocaleDateString(dateLocale, { day: "numeric", month: "long", year: "numeric" })}
 								</time>
 								<div class="md:col-span-9">
+									{post.data.image && (
+										<Image
+											class="mb-5 aspect-video w-full rounded-lg object-cover"
+											src={post.data.image.source}
+											alt={post.data.image.alt}
+										/>
+									)}
 									<p class="font-mono text-lg font-medium uppercase tracking-wide text-slate-100 transition-colors group-hover:text-white lg:text-xl">
 										{post.data.title}
 									</p>
