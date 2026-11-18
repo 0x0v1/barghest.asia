@@ -30,11 +30,11 @@ const dateLocale = lang === "cn" ? "zh-CN" : lang === "ru" ? "ru-RU" : "en-GB";
 								<div class="flex gap-4 md:col-span-9">
 									{post.data.image && (
 										<Image
-											class="aspect-video w-40 shrink-0 self-start rounded-md object-cover sm:w-56"
+											class="aspect-video w-44 shrink-0 self-start rounded-md object-cover sm:w-64"
 											src={post.data.image.source}
 											alt={post.data.image.alt}
-											widths={[320, 448, 672, 896]}
-											sizes="(min-width: 640px) 448px, 320px"
+											widths={[352, 512, 768, 1024]}
+											sizes="(min-width: 640px) 512px, 352px"
 											quality={82}
 										/>
 									)}
