@@ -23,25 +23,30 @@ const dateLocale = lang === "cn" ? "zh-CN" : lang === "ru" ? "ru-RU" : "en-GB";
 				<ul class="blog-list">
 					{posts.map((post) => (
 						<li>
-							<a href={translatePath(`/blog/${post.slug}/`)} class="group grid gap-4 py-8 md:grid-cols-12 md:gap-8">
-								<time class="font-mono text-xs uppercase text-slate-500 md:col-span-3 md:pt-1.5" datetime={post.data.pubDate.toISOString()}>
+							<a href={translatePath(`/blog/${post.slug}/`)} class="group grid gap-2 py-6 md:grid-cols-12 md:gap-8">
+								<time class="font-mono text-xs uppercase text-slate-500 md:col-span-3 md:pt-1" datetime={post.data.pubDate.toISOString()}>
 									{post.data.pubDate.toLocaleDateString(dateLocale, { day: "numeric", month: "long", year: "numeric" })}
 								</time>
-								<div class="md:col-span-9">
+								<div class="flex gap-4 md:col-span-9">
 									{post.data.image && (
 										<Image
-											class="mb-5 aspect-video w-full rounded-lg object-cover"
+											class="aspect-video w-40 shrink-0 self-start rounded-md object-cover sm:w-56"
 											src={post.data.image.source}
 											alt={post.data.image.alt}
+											widths={[320, 448, 672, 896]}
+											sizes="(min-width: 640px) 448px, 320px"
+											quality={82}
 										/>
 									)}
-									<p class="font-mono text-lg font-medium uppercase tracking-wide text-slate-100 transition-colors group-hover:text-white lg:text-xl">
-										{post.data.title}
-									</p>
-									{post.data.description && <p class="mt-2 line-clamp-2 text-base text-slate-400">{post.data.description}</p>}
-									{!!post.data.authors?.length && (
-										<p class="mt-3 font-mono text-xs uppercase text-slate-500">{post.data.authors.map((author) => author.name).join(", ")}</p>
-									)}
+									<div class="min-w-0">
+										<p class="font-mono text-base font-medium uppercase tracking-wide text-slate-100 transition-colors group-hover:text-white lg:text-lg">
+											{post.data.title}
+										</p>
+										{post.data.description && <p class="mt-1.5 line-clamp-2 text-sm text-slate-400">{post.data.description}</p>}
+										{!!post.data.authors?.length && (
+											<p class="mt-2 font-mono text-xs uppercase text-slate-500">{post.data.authors.map((author) => author.name).join(", ")}</p>
+										)}
+									</div>
 								</div>
 							</a>
 						</li>
